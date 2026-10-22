@@ -5,26 +5,85 @@
   <p class="hint">Taip kod bar secara manual di atas, atau <a href="/search">cari mengikut nama ubat</a>.</p>
 </section>
 {% else %}
+{% set info = extra if extra is mapping else {} %}
 <section class="card result" data-scan="saved" data-found="{{ 'yes' if medicine else 'no' }}">
   {% if medicine %}
-    {% if has_image %}
-      <img class="scan-photo" src="/medicines/{{ medicine.id }}/image?v={{ image_version }}"
-           alt="Gambar {{ medicine.name }}" width="160" height="120" loading="lazy">
-    {% endif %}
-    <h2 data-found="yes">{{ medicine.name }}</h2>
-    <p class="lead">
-      {{ medicine.brand }} &middot; {{ medicine.strength }} &middot; {{ medicine.dosage_form }}
-    </p>
-    <p class="muted">Bahan aktif: {{ medicine.active_ingredient }}</p>
+    <div class="result-head">
+      {% if has_image %}
+        <img class="scan-photo" src="/medicines/{{ medicine.id }}/image?v={{ image_version }}"
+             alt="Gambar {{ medicine.name }}" width="240" height="180" loading="lazy">
+      {% else %}
+        <div class="result-photo result-photo-empty" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="m6.5 16 3.2-3.6 2.4 2.6 2.1-2.2 3.3 3.2" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+            <circle cx="9" cy="9.5" r="1.2" fill="currentColor"/>
+          </svg>
+          <span>Tiada gambar</span>
+        </div>
+      {% endif %}
+
+      <div>
+        <h2 data-found="yes">{{ medicine.name }}</h2>
+        {% set meta = [medicine.brand, medicine.strength, medicine.dosage_form]|select|join(' · ') %}
+        <p class="lead">{{ meta }}</p>
+        <div class="chips">
+          {% if medicine.dosage_form %}<span class="chip plain">{{ medicine.dosage_form }}</span>{% endif %}
+          {% if info.get('reg_class') %}
+            <span class="chip {{ 'amber' if info.get('reg_class') in ['POM', 'Preskripsi'] else 'teal' }}">
+              {{ info.get('reg_class') }}{% if info.get('reg_class') in ['POM', 'Preskripsi'] %} &middot; perlu preskripsi{% endif %}
+            </span>
+          {% endif %}
+          {% if info.get('pack_size') %}<span class="chip plain">{{ info.get('pack_size') }}</span>{% endif %}
+          <span class="chip plain mono">{{ medicine.barcode }}</span>
+        </div>
+        {% if medicine.verified %}
+          <p class="verified" data-verified="true">
+            Maklumat disahkan{% if medicine.source %} &middot; {{ medicine.source }}{% endif %}
+          </p>
+        {% else %}
+          <p class="unverified" data-verified="false">
+            Maklumat ubat ini <strong>belum disahkan</strong>, jadi kegunaan dan dos tidak
+            dipaparkan di sini. Sila rujuk bungkusan asal atau ahli farmasi.
+          </p>
+        {% endif %}
+      </div>
+    </div>
+
     {% if medicine.verified %}
-      <p>{{ medicine.uses }}</p>
-      <p class="verified" data-verified="true">Maklumat disahkan &middot; {{ medicine.source }}</p>
-    {% else %}
-      <p class="unverified" data-verified="false">
-        Maklumat ubat ini <strong>belum disahkan</strong>. Sila rujuk bungkusan asal atau ahli farmasi.
-      </p>
+      <div class="blocks result-blocks">
+        {% if medicine.uses %}
+          <section>
+            <p class="eyebrow">Kegunaan</p>
+            <p>{{ medicine.uses }}</p>
+          </section>
+        {% endif %}
+        {% if medicine.dosage_instructions %}
+          <section>
+            <p class="eyebrow">Dos</p>
+            <p>{{ medicine.dosage_instructions }}</p>
+          </section>
+        {% endif %}
+        {% if info.get('how_to_take') %}
+          <section>
+            <p class="eyebrow">Cara pengambilan</p>
+            <p>{{ info.get('how_to_take') }}</p>
+          </section>
+        {% endif %}
+        {% if medicine.warnings %}
+          <section class="warning">
+            <p class="eyebrow">Amaran</p>
+            <p>{{ medicine.warnings }}</p>
+          </section>
+        {% endif %}
+      </div>
     {% endif %}
-    <a class="button" href="/medicines/{{ medicine.id }}">Lihat butiran penuh</a>
+
+    <div class="actions">
+      <a class="button" href="/medicines/{{ medicine.id }}">Lihat butiran penuh</a>
+      <a class="button ghost" href="/scan">Imbas ubat lain</a>
+      {% if medicine.verified %}<a class="button ghost" href="/labels/test">Cetak label</a>{% endif %}
+    </div>
   {% else %}
     <h2 data-empty="no_match">Tiada rekod untuk kod bar {{ barcode }}</h2>
     <p class="lead">

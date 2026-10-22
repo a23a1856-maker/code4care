@@ -3,17 +3,28 @@
 {% block page_name %}scan{% endblock %}
 {% block content %}
 <section class="card">
-  <div class="card-head">
-    <div>
-      <p class="eyebrow">F1 &middot; Pengimbas kod bar</p>
-      <h1>Imbas Ubat</h1>
-    </div>
-    <a class="link" href="/search">Cari secara manual</a>
+  <div class="hero-head">
+    <span class="pill">IMBAS</span>
+    <h1>Imbas Kod Ubat</h1>
   </div>
   <p class="lead">
     Letakkan kod bar pada kotak ubat di dalam ruang imbasan. Kamera hanya digunakan
     selepas anda membenarkannya, dan imej tidak dihantar ke pelayan.
   </p>
+
+  <button class="scan-panel" type="button" id="start-camera">
+    <span class="scan-panel-icon" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none">
+        <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"
+              stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M7.5 9v6M10 8v8M13 9v6M16.5 8v8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+    </span>
+    <span>
+      <strong>Imbas Kod Ubat</strong>
+      <small>Tekan untuk mulakan kamera &mdash; barcode pada kotak ubat</small>
+    </span>
+  </button>
 
   <div class="scanner">
     <div class="video-frame">
@@ -24,10 +35,12 @@
       </div>
     </div>
     <div class="scanner-actions">
-      <button class="button" type="button" id="start-camera">Mulakan kamera</button>
       <button class="button ghost" type="button" id="stop-camera" hidden>Hentikan kamera</button>
+      <a class="button ghost" href="/search">Cari secara manual</a>
     </div>
   </div>
+
+  <div class="divider"><span>kalau tak boleh imbas, taip kod ubat</span></div>
 
   <form id="scan-form" class="stack" method="post" action="/scan/lookup"
         hx-post="/scan/lookup" hx-target="#scan-result" hx-swap="innerHTML"
@@ -35,9 +48,9 @@
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="request_id" id="request-id" value="">
     <label for="barcode-input">Kod bar ubat</label>
-    <div class="row">
+    <div class="search-row">
       <input id="barcode-input" name="barcode" inputmode="numeric" autocomplete="off"
-             autocapitalize="characters" maxlength="32" placeholder="Contoh: 9550010000013"
+             autocapitalize="characters" maxlength="32" placeholder="cth: 9550010000015 atau C4C-0001"
              required autofocus>
       <button class="button" type="submit">Semak</button>
     </div>
@@ -51,7 +64,10 @@
 </section>
 
 <section class="card ghost-card">
-  <h2>Jika kod bar tidak dijumpai</h2>
+  <div class="card-head">
+    <h2>Jika kod bar tidak dijumpai</h2>
+    <a class="link" href="/labels/test">Label ujian</a>
+  </div>
   <ul class="bullets">
     <li>Pastikan kod bar tidak kabur atau terlipat.</li>
     <li>Taip 8, 12 atau 13 digit kod bar secara manual di atas.</li>

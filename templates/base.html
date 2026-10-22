@@ -5,34 +5,58 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block title %}CODE4CARE{% endblock %}</title>
   <meta name="csrf-token" content="{{ csrf_token }}">
-  <link rel="icon" href="/static/favicon.svg?v=20261022j" type="image/svg+xml">
-  <link rel="stylesheet" href="/static/app.css?v=20261022j">
-  <script src="/static/vendor/htmx.min.js?v=20261022j" defer></script>
-  <script src="/static/app.js?v=20261022j" defer></script>
+  <link rel="icon" href="/static/favicon.svg?v=20261022r" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css?v=20261022r">
+  <script src="/static/vendor/htmx.min.js?v=20261022r" defer></script>
+  <script src="/static/app.js?v=20261022r" defer></script>
 </head>
 <body data-page="{% block page_name %}page{% endblock %}">
   <a class="skip-link" href="#main">Langkau ke kandungan</a>
+
   <header class="topbar">
     <a class="brand" href="/">
-      <span class="brand-mark" aria-hidden="true">C4C</span>
-      <span class="brand-text">CODE4CARE<small>Maklumat ubat, pantas dan tepat</small></span>
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 32 32" fill="none">
+          <path d="M16 26.5S6.5 21 6.5 14.6A5.1 5.1 0 0 1 16 11.4a5.1 5.1 0 0 1 9.5 3.2c0 6.4-9.5 11.9-9.5 11.9Z"
+                stroke="#fff" stroke-width="2" stroke-linejoin="round"/>
+          <path d="M9.8 16.2h3.1l1.7-3.1 2.3 6 1.7-2.9h3.6"
+                stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      <span class="brand-text">CODE4CARE<small>Katalog ubat · imbas barcode</small></span>
     </a>
+
     {% if user %}
       <nav class="nav" aria-label="Navigasi utama">
         {% for item in nav %}
-          <a href="{{ item.path }}">{{ item.label }}</a>
+          <a href="{{ item.path }}"
+             class="{% if current_path == item.path %}is-active{% endif %}">{{ item.label }}</a>
         {% endfor %}
       </nav>
+
       <div class="account">
         <span class="account-name">{{ user.email }}</span>
         <span class="badge">{{ role_label }}</span>
+        {% if can_settings %}
+          <a class="icon-button" href="/settings" aria-label="Tetapan perniagaan" title="Tetapan">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+              <circle cx="12" cy="12" r="3.2" stroke="currentColor" stroke-width="1.8"/>
+              <path d="M19 12a7 7 0 0 0-.12-1.3l1.7-1.3-1.8-3.1-2 .8a7 7 0 0 0-2.2-1.3L14.2 3h-3.6l-.3 2.1a7 7 0 0 0-2.2 1.3l-2-.8-1.8 3.1 1.7 1.3a7 7 0 0 0 0 2.6l-1.7 1.3 1.8 3.1 2-.8a7 7 0 0 0 2.2 1.3l.3 2.1h3.6l.3-2.1a7 7 0 0 0 2.2-1.3l2 .8 1.8-3.1-1.7-1.3c.08-.43.12-.86.12-1.3Z"
+                    stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/>
+            </svg>
+          </a>
+        {% endif %}
         <form method="post" action="/logout" class="inline">
           <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
           <button type="submit" class="link-button">Keluar</button>
         </form>
       </div>
     {% else %}
-      <a class="button small" href="/login">Masuk</a>
+      <div class="account">
+        {% if current_path != '/login' %}
+          <a class="button small" href="/login">Masuk</a>
+        {% endif %}
+      </div>
     {% endif %}
   </header>
 
@@ -49,8 +73,9 @@
     </p>
     <p><a href="/privacy">Notis privasi (PDPA)</a> &middot; <a href="/terms">Terma perkhidmatan</a></p>
     <p class="fineprint">
-      Maklumat ubat di CODE4CARE adalah rujukan sahaja dan bukan pengganti nasihat doktor
-      atau ahli farmasi. Jika simptom berterusan, dapatkan rawatan.
+      CODE4CARE &mdash; katalog ubat berasaskan barcode. Maklumat ubat adalah rujukan
+      sahaja dan bukan pengganti nasihat doktor atau ahli farmasi. Sentiasa sahkan
+      dengan label produk dan risalah pakej.
     </p>
   </footer>
 </body>

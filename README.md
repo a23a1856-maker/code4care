@@ -12,7 +12,8 @@ CSV — see `docs/CATALOG_IMPORT.md` (the sample files `catalog code4care.csv` a
 `catalog code4care.xlsx` show the expected columns). `/labels/test` prints a
 barcode and QR label per medicine for trying the scanner without a physical box —
 see `docs/TEST_LABELS.md`. Medicine pictures are uploaded per medicine or as a ZIP
-named by barcode — see `docs/MEDICINE_IMAGES.md`.
+named by barcode — see `docs/MEDICINE_IMAGES.md`. The look of the pages follows the
+reference UI in `docs/DESIGN.md` (palette, components and the reason for each choice).
 Start here:
 
 ```bash

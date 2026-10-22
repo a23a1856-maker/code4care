@@ -23,6 +23,8 @@ def _context(request: Request) -> dict:
         "role": role,
         "role_label": role or "",
         "nav": permissions.nav_for(role),
+        "can_settings": permissions.allowed(role or "", permissions.PERM_SETTINGS),
+        "current_path": request.url.path,
         "csrf_token": getattr(request.state, "csrf", ""),
         "tenant_name": getattr(request.state, "tenant_name", "") or "",
         "support_email": settings.support_email,

@@ -60,6 +60,7 @@ ROUTE_RULES: dict[str, str] = {
     "/medicines/{medicine_id}/image": PERM_DETAILS,
     "/medicines/{medicine_id}/image/upload": PERM_SETTINGS,
     "/medicines/{medicine_id}/image/remove": PERM_SETTINGS,
+    "/medicines/{medicine_id}/verify": PERM_SETTINGS,
     "/history": PERM_SCAN,
     "/favourites": PERM_SCAN,
     "/favourites/{medicine_id}": PERM_SCAN,
@@ -94,6 +95,19 @@ NO_PERMISSION_MESSAGE = (
 SIGNED_OUT_MESSAGE = "Sesi anda telah tamat. Sila masuk semula untuk meneruskan."
 
 TRUTHY_FORM_VALUES = {"1", "ya", "yes", "on", "true", "t"}
+
+
+def _medicine_extra(medicine: dict | None) -> dict:
+    """The imported catalogue's extra columns, as a dict (empty when absent)."""
+    if not medicine:
+        return {}
+    try:
+        extra = json.loads(medicine.get("extra_json") or "{}")
+    except (TypeError, ValueError):
+        return {}
+    return extra if isinstance(extra, dict) else {}
+
+
 CATALOG_EXTRA_LABELS = {
     "how_to_take": "Cara mengambil",
     "reg_class": "Kelas pendaftaran",
@@ -409,8 +423,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     @app.get("/", response_class=HTMLResponse)
     def home(request: Request):
         user = _user(request)
-        recent = db.list_scans(_conn(request), user["tenant_id"], user["id"], limit=5) if user else []
-        return ui.render(request, "home.html", recent=recent)
+        conn = _conn(request)
+        recent = (
+            db.list_scans(conn, user["tenant_id"], user["id"], limit=5) if user else []
+        )
+        stats = db.catalogue_stats(conn, user["tenant_id"]) if user else None
+        return ui.render(request, "home.html", recent=recent, stats=stats)
 
     @app.get("/login", response_class=HTMLResponse)
     def login_page(request: Request):
@@ -749,6 +767,7 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         return ui.render(
             request, "partials/scan_result.html",
             scan_id=scan_id, barcode=clean, medicine=medicine,
+            extra=_medicine_extra(medicine),
             has_image=bool(medicine) and images.has_image(
                 settings, user["tenant_id"], medicine["id"]
             ),
@@ -863,19 +882,15 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             for row in db.list_favourites(conn, user["tenant_id"], user["id"])
         )
         extra_items = []
-        try:
-            extra = json.loads(medicine.get("extra_json") or "{}")
-        except (TypeError, ValueError):
-            extra = {}
-        if isinstance(extra, dict):
-            for key, label in CATALOG_EXTRA_LABELS.items():
-                value = extra.get(key)
-                if value not in (None, ""):
-                    extra_items.append({"label": label, "value": value})
+        extra = _medicine_extra(medicine)
+        for key, label in CATALOG_EXTRA_LABELS.items():
+            value = extra.get(key)
+            if value not in (None, ""):
+                extra_items.append({"label": label, "value": value})
         settings = request.app.state.settings
         return ui.render(
             request, "medicine.html", medicine=medicine, favourite=favourite,
-            extra_items=extra_items,
+            extra_items=extra_items, extra=extra,
             has_image=images.has_image(settings, user["tenant_id"], medicine["id"]),
             image_version=images.image_version(settings, user["tenant_id"], medicine["id"]),
             can_manage=permissions.allowed(user["role"], PERM_SETTINGS),
@@ -970,6 +985,30 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             db.audit(_conn(request), user["tenant_id"], user["id"],
                      "medicine.image_removed", medicine["barcode"])
         return _image_panel(request, medicine, notice="Gambar dibuang.")
+
+    # ------------------------------------------------------- medicine verification
+
+    @app.post(
+        "/medicines/{medicine_id}/verify",
+        dependencies=[Depends(security.verify_csrf)],
+    )
+    def medicine_verify(request: Request, medicine_id: str):
+        """Owner confirms the uses/dose text, so staff and scans may show it."""
+        medicine = _medicine_from_path(request, medicine_id)
+        if medicine is None:
+            return ui.render_error(
+                request, 404, "medicine_not_found", "Ubat tidak dijumpai.",
+                title="Ubat tidak dijumpai",
+            )
+        user = _user(request)
+        conn = _conn(request)
+        db.verify_medicine(
+            conn, user["tenant_id"], medicine["id"],
+            source=f"Disahkan oleh {user['email']}",
+        )
+        db.audit(conn, user["tenant_id"], user["id"],
+                 "medicine.verified", medicine["barcode"])
+        return RedirectResponse(f"/medicines/{medicine['id']}", status_code=303)
 
     @app.post(
         "/catalog/images",

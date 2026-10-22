@@ -661,6 +661,27 @@ def audit(
     conn.commit()
 
 
+def verify_medicine(
+    conn: sqlite3.Connection, tenant_id: int, medicine_id: int, *, source: str
+) -> bool:
+    """Mark one medicine's information as checked by the business.
+
+    Only a verified medicine shows uses, dose and warnings to staff and on a
+    scan; the flag is what separates checked reference text from an import.
+    """
+    now = utcnow()
+    cursor = conn.execute(
+        """
+        UPDATE medicines
+           SET verified = 1, verified_at = ?, source = ?, updated_at = ?
+         WHERE tenant_id = ? AND id = ?
+        """,
+        (now, source, now, tenant_id, medicine_id),
+    )
+    conn.commit()
+    return cursor.rowcount > 0
+
+
 # ----------------------------------------------------------------- rate limits etc.
 
 
@@ -792,3 +813,24 @@ def count_rows(conn: sqlite3.Connection, tenant_id: int, table: str) -> int:
         raise ValueError(f"unknown table: {table}")
     row = conn.execute(f"SELECT COUNT(*) AS n FROM {table} WHERE tenant_id = ?", (tenant_id,)).fetchone()
     return int(row["n"])
+
+
+def catalogue_stats(conn: sqlite3.Connection, tenant_id: int) -> dict:
+    """Small headline numbers for the dashboard, scoped to one business."""
+    row = scoped_one(
+        conn,
+        """
+        SELECT COUNT(*) AS medicines,
+               COUNT(DISTINCT CASE WHEN category <> '' THEN category END) AS categories,
+               SUM(CASE WHEN verified = 0 THEN 1 ELSE 0 END) AS unverified
+        FROM medicines WHERE tenant_id = ?
+        """,
+        tenant_id,
+    )
+    scans = scoped_one(conn, "SELECT COUNT(*) AS n FROM scans WHERE tenant_id = ?", tenant_id)
+    return {
+        "medicines": int(row["medicines"] or 0) if row else 0,
+        "categories": int(row["categories"] or 0) if row else 0,
+        "unverified": int(row["unverified"] or 0) if row else 0,
+        "scans": int(scans["n"] or 0) if scans else 0,
+    }

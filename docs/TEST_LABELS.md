@@ -47,3 +47,19 @@ random QR code cannot create noise in the scan history.
   including a print stylesheet.
 - Tests: `tests/test_labels.py` (generators, page, pagination, permissions,
   scanning internal codes and QR-equivalent values, unknown codes refused).
+
+## What the scan shows
+
+The QR payload is the product code itself, so a phone scan posts exactly what the
+barcode reader posts. The result card answers the four counter questions:
+
+- the name, with brand, strength and form, chips for form / OTC or POM / pack size
+  and the code;
+- **Kegunaan** — what it is for;
+- **Dos** — how much and how often;
+- **Cara pengambilan** — how to take it, when the catalogue has it;
+- **Amaran** — the warning that matters most.
+
+A picture of the medicine is shown when one has been uploaded. For an unverified
+row the card says so and shows no uses, dose or warnings, with a link to the full
+page. Covered by `tests/test_scan_details.py`.

@@ -69,3 +69,23 @@ The restore refuses archive entries that try to escape the target folder (zip sl
 stripping, bad and oversize files, CSRF, removal, permissions per role, tenant
 isolation on disk and over HTTP, the ZIP import (matched / unmatched / skipped),
 search and scan thumbnails, and the media backup-and-restore round trip.
+
+## The demo photo pack (`code4care-photos.zip`)
+
+The photos supplied with the catalogue are named by product code — `C4C-0001.jpg`
+through `C4C-0039.jpg` — which is exactly the lookup rule: the file name (without
+extension) must equal the medicine's barcode. Uploaded through **Import Katalog →
+Fail ZIP gambar**, the pack produced **39 saved, 0 unmatched, 0 skipped**.
+
+Storage after the import: `data/medicine-images/1/17.jpg` … `55.jpg`, one file per
+medicine, matched to the imported catalogue rows (ids 17–55). Each file was decoded
+by Pillow, turned upright, resized to 1200 px, re-encoded as JPEG and stripped of
+metadata before being written, so the pack's contents cannot carry GPS or EXIF into
+the app.
+
+A spot check against the catalogue confirms the pairing: C4C-0010 → Piriton 4 mg,
+C4C-0025 → Norvasc 5 mg, C4C-0039 → Ferrous Fumarate 200 mg.
+
+Note that a picture does not change whether a medicine is **verified**: the imported
+rows still hide uses and dose until the owner presses “Sahkan maklumat ubat” on each
+medicine they have checked.

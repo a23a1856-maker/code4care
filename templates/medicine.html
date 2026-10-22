@@ -4,89 +4,125 @@
 {% block content %}
 <div class="medicine-layout">
   {% include "partials/medicine_image.html" %}
-  <section class="card medicine" data-verified="{{ 'true' if medicine.verified else 'false' }}">
-  <p class="eyebrow">F3 &middot; Butiran ubat</p>
-  <h1 data-field="name">{{ medicine.name }}</h1>
-  <p class="lead">
-    <span data-field="brand">{{ medicine.brand }}</span> &middot;
-    <span data-field="strength">{{ medicine.strength }}</span> &middot;
-    <span data-field="dosage_form">{{ medicine.dosage_form }}</span>
-    {% if medicine.category %}&middot; <span class="badge">{{ medicine.category }}</span>{% endif %}
-  </p>
 
-  {% if medicine.verified %}
-    <p class="verified" data-verified="true">
-      Maklumat disahkan &middot; Sumber: {{ medicine.source }}
-      {% if medicine.verified_at %}&middot; {{ medicine.verified_at[:10] }}{% endif %}
-    </p>
-  {% else %}
-    <p class="unverified" role="status" data-verified="false">
-      Maklumat ubat ini <strong>belum disahkan</strong>. Kami memaparkan butiran asas
-      sahaja dan tidak menyenaraikan kegunaan, dos atau amaran sehingga ia disemak.
-      Sila rujuk bungkusan asal atau ahli farmasi.
-    </p>
-  {% endif %}
+  <div class="stack tight">
+    <article class="card medicine-hero" data-verified="{{ 'true' if medicine.verified else 'false' }}">
+      <p class="eyebrow">{{ medicine.category or 'Butiran ubat' }}</p>
+      <h1 data-field="name">{{ medicine.name }}</h1>
+      {% set meta = [medicine.brand, medicine.strength, medicine.dosage_form]|select|join(' · ') %}
+      <p class="lead" data-field="meta">{{ meta }}</p>
 
-  <dl class="details">
-    <div><dt>Nama</dt><dd data-field="name">{{ medicine.name }}</dd></div>
-    <div><dt>Jenama</dt><dd data-field="brand">{{ medicine.brand }}</dd></div>
-    <div><dt>Bahan aktif</dt><dd data-field="active_ingredient">{{ medicine.active_ingredient }}</dd></div>
-    <div><dt>Kekuatan</dt><dd data-field="strength">{{ medicine.strength }}</dd></div>
-    <div><dt>Bentuk dos</dt><dd data-field="dosage_form">{{ medicine.dosage_form }}</dd></div>
-    <div><dt>Pengeluar</dt><dd data-field="manufacturer">{{ medicine.manufacturer }}</dd></div>
-    <div><dt>Kod bar</dt><dd class="mono" data-field="barcode">{{ medicine.barcode }}</dd></div>
-  </dl>
+      <div class="chips">
+        {% if medicine.dosage_form %}<span class="chip plain">{{ medicine.dosage_form }}</span>{% endif %}
+        {% if extra.get('reg_class') %}
+          <span class="chip {{ 'amber' if extra.get('reg_class') in ['POM', 'Preskripsi'] else 'teal' }}">
+            {{ extra.get('reg_class') }}{% if extra.get('reg_class') in ['POM', 'Preskripsi'] %} &middot; perlu preskripsi{% endif %}
+          </span>
+        {% endif %}
+        {% if extra.get('pack_size') %}<span class="chip plain">{{ extra.get('pack_size') }}</span>{% endif %}
+        <span class="chip plain mono" data-field="barcode">{{ medicine.barcode }}</span>
+      </div>
 
-  {% if medicine.verified %}
-    <div class="blocks">
-      <section>
-        <h2>Kegunaan</h2>
-        <p>{{ medicine.uses }}</p>
-      </section>
-      <section>
-        <h2>Cara pengambilan</h2>
-        <p>{{ medicine.dosage_instructions }}</p>
-      </section>
-      <section class="warning">
-        <h2>Amaran keselamatan</h2>
-        <p>{{ medicine.warnings }}</p>
-      </section>
+      {% if medicine.verified %}
+        <p class="verified" data-verified="true">
+          Maklumat disahkan{% if medicine.source %} &middot; {{ medicine.source }}{% endif %}
+          {% if medicine.verified_at %} &middot; {{ medicine.verified_at[:10] }}{% endif %}
+        </p>
+      {% else %}
+        <p class="unverified" role="status" data-verified="false">
+          Maklumat ubat ini <strong>belum disahkan</strong>. Kami memaparkan butiran
+          asas sahaja dan tidak menyenaraikan kegunaan, dos atau amaran sehingga ia
+          disemak. Sila rujuk bungkusan asal atau ahli farmasi.
+          {% if can_manage %}Semak teks di bawah, kemudian tekan &ldquo;Sahkan maklumat ubat&rdquo;.{% endif %}
+        </p>
+      {% endif %}
+
+      <div class="actions">
+        {% include "partials/favourite_button.html" %}
+        <a class="button" href="/scan">Imbas lagi</a>
+        <a class="button ghost" href="/labels/test">Cetak label</a>
+        <a class="button ghost" href="/search">Cari ubat lain</a>
+        {% if can_manage and not medicine.verified %}
+          <form method="post" action="/medicines/{{ medicine.id }}/verify" class="inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <button class="button" type="submit">Sahkan maklumat ubat</button>
+          </form>
+        {% endif %}
+      </div>
+    </article>
+
+    {% if medicine.verified %}
+      {% if medicine.uses %}
+        <section class="card section-card">
+          <p class="eyebrow">Kegunaan</p>
+          <p>{{ medicine.uses }}</p>
+        </section>
+      {% endif %}
+
+      {% if medicine.dosage_instructions %}
+        <section class="card section-card soft">
+          <p class="eyebrow">Dos</p>
+          <p>{{ medicine.dosage_instructions }}</p>
+        </section>
+      {% endif %}
+
+      {% if extra.get('how_to_take') %}
+        <section class="card section-card">
+          <p class="eyebrow">Cara pengambilan</p>
+          <p>{{ extra.get('how_to_take') }}</p>
+        </section>
+      {% endif %}
+
+      {% if medicine.warnings %}
+        <section class="card section-card warning">
+          <p class="eyebrow">Amaran</p>
+          <p>{{ medicine.warnings }}</p>
+        </section>
+      {% endif %}
+
       {% if medicine.side_effects %}
-        <section>
-          <h2>Kesan sampingan</h2>
+        <section class="card section-card">
+          <p class="eyebrow">Kesan sampingan</p>
           <p>{{ medicine.side_effects }}</p>
         </section>
       {% endif %}
+
       {% if medicine.storage %}
-        <section>
-          <h2>Penyimpanan</h2>
+        <section class="card section-card">
+          <p class="eyebrow">Penyimpanan</p>
           <p>{{ medicine.storage }}</p>
         </section>
       {% endif %}
-    </div>
-  {% endif %}
+    {% endif %}
 
-  {% if extra_items %}
-    <section class="catalog-meta">
-      <h2>Maklumat katalog</h2>
+    <section class="card section-card">
+      <p class="eyebrow">Maklumat produk</p>
       <dl class="details">
-        {% for item in extra_items %}
-          <div><dt>{{ item.label }}</dt><dd>{{ item.value }}</dd></div>
-        {% endfor %}
+        <div><dt>Nama</dt><dd data-field="name">{{ medicine.name }}</dd></div>
+        <div><dt>Jenama</dt><dd data-field="brand">{{ medicine.brand }}</dd></div>
+        <div><dt>Bahan aktif</dt><dd data-field="active_ingredient">{{ medicine.active_ingredient }}</dd></div>
+        <div><dt>Kekuatan</dt><dd data-field="strength">{{ medicine.strength }}</dd></div>
+        <div><dt>Bentuk dos</dt><dd data-field="dosage_form">{{ medicine.dosage_form }}</dd></div>
+        <div><dt>Pengeluar</dt><dd data-field="manufacturer">{{ medicine.manufacturer }}</dd></div>
+        <div><dt>Kod bar</dt><dd class="mono" data-field="barcode">{{ medicine.barcode }}</dd></div>
       </dl>
     </section>
-  {% endif %}
 
-  <div class="actions">
-    {% include "partials/favourite_button.html" %}
-    <a class="button ghost" href="/scan">Imbas ubat lain</a>
-    <a class="button ghost" href="/search">Cari ubat</a>
-  </div>
+    {% if extra_items %}
+      <section class="card section-card catalog-meta">
+        <p class="eyebrow">Maklumat katalog</p>
+        <dl class="details">
+          {% for item in extra_items %}
+            <div><dt>{{ item.label }}</dt><dd>{{ item.value }}</dd></div>
+          {% endfor %}
+        </dl>
+      </section>
+    {% endif %}
 
-  <p class="fineprint">
-    Maklumat ini untuk rujukan staf farmasi. Nasihat kepada pelanggan mesti
-    mengambil kira keadaan individu, kehamilan, alahan dan ubat lain yang diambil.
-  </p>
-  </section>
+    <p class="fineprint">
+      Maklumat ini untuk rujukan staf farmasi. Nasihat kepada pelanggan mesti
+      mengambil kira keadaan individu, kehamilan, alahan dan ubat lain yang diambil.
+    </p>
   </div>
-  {% endblock %}
+</div>
+{% endblock %}

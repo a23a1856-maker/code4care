@@ -1,37 +1,56 @@
 {% extends "base.html" %}
-{% block title %}CODE4CARE &middot; Maklumat ubat melalui kod bar{% endblock %}
+{% block title %}CODE4CARE &middot; Katalog ubat &amp; imbas barcode{% endblock %}
 {% block page_name %}home{% endblock %}
 {% block content %}
 {% if user %}
-  <section class="hero">
-    <div>
-      <p class="eyebrow">{{ tenant_name }}</p>
-      <h1>Selamat kembali</h1>
-      <p class="lead">
-        Imbas kod bar ubat untuk melihat nama, bahan aktif, kekuatan, bentuk dos,
-        kegunaan dan amaran apabila maklumat yang disahkan tersedia.
-      </p>
-    </div>
-    <div class="hero-actions">
-      {% if nav %}
-        <a class="button" href="/scan">Imbas Ubat</a>
-        <a class="button ghost" href="/search">Cari mengikut kod bar atau nama</a>
-      {% endif %}
-    </div>
-  </section>
-
-  <section class="grid">
-    {% for item in nav[:4] %}
-      <a class="tile" href="{{ item.path }}">
-        <span class="tile-label">{{ item.label }}</span>
-        <span class="tile-hint">Buka</span>
-      </a>
-    {% endfor %}
-  </section>
-
-  {% if not nav %}
+  {% if nav %}
     <section class="card">
-      <h2>Peranan anda belum mempunyai akses</h2>
+      <div class="hero-head">
+        <span class="pill">CARI UBAT</span>
+        <h1>Imbas atau taip kod ubat</h1>
+      </div>
+
+      <a class="scan-panel" href="/scan">
+        <span class="scan-panel-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none">
+            <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"
+                  stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M7.5 9v6M10 8v8M13 9v6M16.5 8v8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+          </svg>
+        </span>
+        <span>
+          <strong>Imbas Kod Ubat</strong>
+          <small>Kamera &mdash; barcode pada kotak ubat</small>
+        </span>
+      </a>
+
+      <div class="divider"><span>kalau tak boleh imbas, taip kod ubat</span></div>
+
+      <form class="search-row" method="post" action="/lookup/barcode"
+            hx-post="/lookup/barcode" hx-target="#home-results" hx-swap="innerHTML">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+        <input type="hidden" name="request_id" value="">
+        <input id="home-code" name="barcode" inputmode="numeric" autocomplete="off"
+               maxlength="32" placeholder="cth: 9550010000015 atau C4C-0001"
+               aria-label="Kod ubat" required>
+        <button class="button" type="submit">Cari</button>
+      </form>
+      <p class="hint">
+        Kod ada dicetak di bawah barcode pada label (cth. <span class="mono">C4C-0001</span>)
+        atau boleh dilihat dalam butiran ubat.
+      </p>
+      <div id="home-results" aria-live="polite"></div>
+
+      <div class="stats">
+        <span><strong>{{ stats.medicines }}</strong> ubat</span>
+        <span><strong>{{ stats.categories }}</strong> kategori</span>
+        <span class="warn"><strong>{{ stats.unverified }}</strong> belum disahkan</span>
+        <span><strong>{{ stats.scans }}</strong> imbasan</span>
+      </div>
+    </section>
+  {% else %}
+    <section class="card">
+      <h1>Peranan anda belum mempunyai akses</h1>
       <p class="lead">
         Peranan <strong>{{ role_label }}</strong> tidak dibenarkan menggunakan ciri
         versi 1. Hubungi pemilik perniagaan untuk menukar peranan anda, atau
@@ -39,6 +58,14 @@
       </p>
     </section>
   {% endif %}
+
+  <section class="grid">
+    {% for item in nav if item.path not in ['/scan', '/search'] %}
+      <a class="tile" href="{{ item.path }}">
+        <span class="tile-label">{{ item.label }}</span>
+      </a>
+    {% endfor %}
+  </section>
 
   <section class="card">
     <div class="card-head">
@@ -61,36 +88,71 @@
       </ul>
     {% else %}
       {% if nav %}
-        <p class="muted">Belum ada imbasan. Mulakan dengan butang “Imbas Ubat”.</p>
+        <p class="muted">Belum ada imbasan. Mulakan dengan butang &ldquo;Imbas Kod Ubat&rdquo;.</p>
       {% else %}
         <p class="muted">Tiada imbasan untuk peranan anda.</p>
       {% endif %}
     {% endif %}
   </section>
 {% else %}
-  <section class="hero landing">
-    <div>
-      <p class="eyebrow">Untuk farmasi komuniti di Malaysia</p>
-      <h1>Jawab soalan pelanggan tentang ubat, dengan yakin.</h1>
-      <p class="lead">
-        CODE4CARE membantu staf farmasi mengenal pasti ubat melalui kod bar dan
-        memberikan maklumat yang jelas serta disahkan: kegunaan, cara pengambilan
-        dan amaran keselamatan.
-      </p>
-      <div class="hero-actions">
-        <a class="button" href="/login">Masuk ke CODE4CARE</a>
-      </div>
-      <p class="fineprint">
-        Log masuk menggunakan pautan e-mel atau akaun Google. Tiada kata laluan disimpan.
-      </p>
+  <section class="card hero landing">
+    <div class="hero-head">
+      <span class="pill">CARI UBAT</span>
     </div>
-    <div class="card steps">
-      <h2>Bagaimana ia berfungsi</h2>
-      <ol>
-        <li><strong>Imbas</strong> kod bar pada kotak ubat menggunakan kamera telefon.</li>
-        <li><strong>Cari</strong> padanan dalam katalog perniagaan anda.</li>
-        <li><strong>Terangkan</strong> kegunaan, dos dan amaran kepada pelanggan.</li>
-      </ol>
+    <h1>Jawab soalan pelanggan tentang ubat, dengan yakin.</h1>
+    <p class="lead">
+      CODE4CARE membantu farmasi komuniti di Malaysia mengenal pasti ubat melalui
+      kod bar dan memberikan maklumat yang jelas serta disahkan: kegunaan, dos,
+      cara pengambilan dan amaran keselamatan.
+    </p>
+
+    <div class="scan-panel" aria-hidden="true">
+      <span class="scan-panel-icon">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"
+                stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>
+          <path d="M7.5 9v6M10 8v8M13 9v6M16.5 8v8" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+      </span>
+      <span>
+        <strong>Imbas Kod Ubat</strong>
+        <small>Kod bar pada kotak ubat &rarr; butiran ubat</small>
+      </span>
+    </div>
+
+    <div class="hero-actions">
+      <a class="button" href="/login">Masuk ke CODE4CARE</a>
+      <a class="button ghost" href="/login">Cuba demo</a>
+    </div>
+    <p class="fineprint">
+      Log masuk menggunakan pautan e-mel atau akaun Google. Tiada kata laluan disimpan.
+    </p>
+
+    <div class="steps">
+      <div class="step">
+        <span class="step-number">1</span>
+        <span><strong>Satu kod, satu tempat scan</strong>
+          <span>Imbas barcode pada kotak ubat; kalau kamera tak boleh, taip kod C4C-xxxx.</span></span>
+      </div>
+      <div class="step">
+        <span class="step-number">2</span>
+        <span><strong>Kod disemak</strong>
+          <span>Kod dipadankan dengan katalog; kod tak dikenali menunjukkan mesej jelas.</span></span>
+      </div>
+      <div class="step">
+        <span class="step-number">3</span>
+        <span><strong>Butiran keluar</strong>
+          <span>Gambar, nama, bentuk, dos, kegunaan dan cara pengambilan dipaparkan.</span></span>
+      </div>
+    </div>
+  </section>
+
+  <section class="card ghost-card">
+    <h2>Apa yang disediakan</h2>
+    <div class="grid">
+      <div class="tile"><span class="tile-label">Imbas kod bar</span><span class="tile-hint">Kamera atau pembaca USB</span></div>
+      <div class="tile"><span class="tile-label">Cari ubat</span><span class="tile-hint">Kod bar, nama atau bahan aktif</span></div>
+      <div class="tile"><span class="tile-label">Butiran disahkan</span><span class="tile-hint">Kegunaan, dos dan amaran</span></div>
     </div>
   </section>
 {% endif %}

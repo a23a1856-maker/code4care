@@ -93,3 +93,18 @@ So a supplier sends a corrected file every month and you can re-upload it safely
 per-tenant isolation, upsert without duplicates, row-level rejections with line
 numbers, dry run, verified/unverified display, bad files, oversize uploads, the
 template download, CSRF, the usage log and CSV-injection neutralisation.
+
+## After importing: verify before the dose shows
+
+Imports are written **unverified** on purpose — a spreadsheet is not a checked
+label. An unverified medicine still appears in search, shows its name, brand,
+strength, form, pack and barcode, and is saved in scan history, but its uses, dose,
+how-to-take and warnings stay hidden on both the details page and the scan result.
+
+To unlock them, the owner opens the medicine and presses **“Sahkan maklumat ubat”**
+(`POST /medicines/{id}/verify`, `settings` permission, tenant scoped). That stamps
+`verified = 1`, the verifier's e-mail in `source`, the date in `verified_at`, and an
+`medicine.verified` line in the usage log.
+
+`tests/test_scan_details.py` covers the unlocked card, the QR payload path, the
+hidden state before verification, owner-only access and cross-tenant refusal.

@@ -1,0 +1,503 @@
+{
+  "schema": "gigalab-blueprint/1",
+  "status": "confirmed",
+  "made": "2026-10-22",
+  "made_with": "GigaLab Module 8 (SaaS Builder Lab)",
+  "product": {
+    "name": "CODE4CARE",
+    "one_liner": "CODE4CARE helps community pharmacies in Malaysia identify medicines by barcode and provide customers with clear, reliable medicine information, including uses, dosage instructions, and safety warnings from verified sources.",
+    "customer": "Community pharmacies and independent pharmacy owners in Malaysia.",
+    "problem": "Customers frequently ask us about medicines, their uses, and how to take them. Our staff spend time searching for reliable information, explaining the same details repeatedly, and helping customers understand medicine labels.",
+    "today": "Pharmacy staff manually inspect medicine packaging, read product leaflets, search medicine databases, consult pharmacists, or refer to official medicine information sources.",
+    "tasks_per_customer_month": null,
+    "customers_year_one": 50,
+    "problem_cost_rm_month": null,
+    "languages": "ms",
+    "channel": "web"
+  },
+  "requirements": {
+    "version_1": "must",
+    "roles": [
+      {
+        "name": "Registered user",
+        "what": "signs in to scan medicine barcodes, view medicine information, access scan history and save medicines to favourites"
+      },
+      {
+        "name": "Pharmacist/health care professional",
+        "what": "Reviews medicine information, checks dosage instructions and warnings, and helps verify medicine information where authorised."
+      },
+      {
+        "name": "Guest User",
+        "what": "Can scan and view permitted public information without creating an account."
+      },
+      {
+        "name": "System Administrator",
+        "what": "Manages system configuration, data sources, integrations and technical operations. Has access only to the administrative functions assigned to this role."
+      }
+    ],
+    "features": [
+      {
+        "id": "F1",
+        "name": "barcode scanner",
+        "what": "Scan medicine barcodes using a mobile camera or compatible barcode scanner",
+        "priority": "must",
+        "used_by": "Registered user",
+        "uses_ai": false,
+        "in_version_1": true,
+        "use_case": {
+          "id": "UC1",
+          "goal": "To scan a medicine barcode using a camera or supported barcode scanner and automatically retrieve the matching medicine information, including its name, active ingredient, strength, dosage form, uses, administration instructions and warnings when verified information is available.",
+          "steps": [
+            "The user opens CODE4CARE and selects Scan Medicine.",
+            "The system requests camera permission if it has not already been granted.",
+            "The user grants permission and positions the medicine barcode within the scanning area.",
+            "The system detects and decodes the barcode automatically.",
+            "The system validates the barcode and searches the medicine database for a matching record.",
+            "The system retrieves the available verified medicine information.",
+            "The system automatically displays the medicine details page when a reliable match is found.",
+            "The user reviews the medicine name, active ingredient, strength, dosage form, uses, administration instructions and warnings.",
+            "If no matching record is found, the system displays a message and offers manual barcode entry or medicine search."
+          ],
+          "errors": [
+            "Missing or invalid input: a message says what to fix, and nothing is saved.",
+            "Signed out, or a role without permission: refused."
+          ],
+          "acceptance": [
+            {
+              "id": "AC1.1",
+              "text": "Given a signed-in Account owner, when they scan medicine barcodes using a mobile camera or compatible barcode scanner, then the result is saved for their business only"
+            },
+            {
+              "id": "AC1.2",
+              "text": "Given a user without permission, when they try it, then it is refused"
+            },
+            {
+              "id": "AC1.3",
+              "text": "Given invalid input, when it is submitted, then a clear message shows and nothing is saved"
+            }
+          ],
+          "test_file": "tests/acceptance/test_f1_barcode_scanner.py"
+        }
+      },
+      {
+        "id": "F2",
+        "name": "Medicine Information Lookup",
+        "what": "Search a medicine database using the scanned barcode.",
+        "priority": "must",
+        "used_by": "Registered user",
+        "uses_ai": false,
+        "in_version_1": true,
+        "use_case": {
+          "id": "UC2",
+          "goal": "Account owner can search a medicine database using the scanned barcode.",
+          "steps": [
+            "1. Account owner opens Medicine Information Lookup.",
+            "2. They enter or choose what it needs, and submit.",
+            "3. The server checks the input and the permission, and saves it for this business only.",
+            "4. The result is shown."
+          ],
+          "errors": [
+            "Missing or invalid input: a message says what to fix, and nothing is saved.",
+            "Signed out, or a role without permission: refused."
+          ],
+          "acceptance": [
+            {
+              "id": "AC2.1",
+              "text": "Given a signed-in Account owner, when they search a medicine database using the scanned barcode., then the result is saved for their business only"
+            },
+            {
+              "id": "AC2.2",
+              "text": "Given a user without permission, when they try it, then it is refused"
+            },
+            {
+              "id": "AC2.3",
+              "text": "Given invalid input, when it is submitted, then a clear message shows and nothing is saved"
+            }
+          ],
+          "test_file": "tests/acceptance/test_f2_medicine_information_lookup.py"
+        }
+      },
+      {
+        "id": "F3",
+        "name": "Medicines details page",
+        "what": "Display the medicine name, brand, active ingredient, strength, dosage form and manufacturer when verified information is available.",
+        "priority": "must",
+        "used_by": "Registered user",
+        "uses_ai": false,
+        "in_version_1": true,
+        "use_case": {
+          "id": "UC3",
+          "goal": "Registered user can display the medicine name, brand, active ingredient, strength, dosage form and manufacturer when verified information is available.",
+          "steps": [
+            "1. Registered user opens Medicines details page.",
+            "2. They enter or choose what it needs, and submit.",
+            "3. The server checks the input and the permission, and saves it for this business only.",
+            "4. The result is shown."
+          ],
+          "errors": [
+            "Missing or invalid input: a message says what to fix, and nothing is saved.",
+            "Signed out, or a role without permission: refused."
+          ],
+          "acceptance": [
+            {
+              "id": "AC3.1",
+              "text": "Given a signed-in Registered user, when they display the medicine name, brand, active ingredient, strength, dosage form and manufacturer when verified information is available., then the result is saved for their business only"
+            },
+            {
+              "id": "AC3.2",
+              "text": "Given a user without permission, when they try it, then it is refused"
+            },
+            {
+              "id": "AC3.3",
+              "text": "Given invalid input, when it is submitted, then a clear message shows and nothing is saved"
+            }
+          ],
+          "test_file": "tests/acceptance/test_f3_medicines_details_page.py"
+        }
+      }
+    ],
+    "data": [],
+    "integrations": [
+      "email"
+    ],
+    "platforms": [
+      "web"
+    ],
+    "out_of_scope": []
+  },
+  "stack": {
+    "confirmed": true,
+    "frontend": {
+      "value": "htmx",
+      "label": "Server pages with htmx"
+    },
+    "backend": {
+      "value": "fastapi",
+      "label": "Python: FastAPI"
+    },
+    "database": {
+      "value": "sqlite",
+      "label": "SQLite"
+    },
+    "extras": [],
+    "hosting": {
+      "value": "vps",
+      "label": "One server (VPS) with Docker"
+    },
+    "commands": {
+      "install": "pip install -r requirements.txt",
+      "test": "pytest -q",
+      "run": "uvicorn app.main:app --reload"
+    },
+    "acceptance_tests": "tests/acceptance"
+  },
+  "quality": {
+    "top_three": [
+      {
+        "id": "security",
+        "title": "Security",
+        "targets": [
+          "Every input is validated on the server",
+          "Secrets live only in environment variables, never in code, logs or the browser",
+          "HTTPS only, secure cookies and CSRF protection",
+          "Rate limits on sign-in and on every public route",
+          "A dependency audit runs on every build (pip-audit or npm audit)",
+          "Reviewed against the OWASP Top 10 before launch"
+        ]
+      },
+      {
+        "id": "reliability",
+        "title": "Reliability",
+        "targets": [
+          "Every error gives a clear message, and nothing is left half-saved",
+          "Calls to outside services time out and retry with back-off",
+          "Daily backups, restored once to prove they work",
+          "Payments and actions are idempotent: a retry never runs them twice"
+        ]
+      },
+      {
+        "id": "performance",
+        "title": "Performance",
+        "targets": [
+          "p95 page load under 2 seconds on a phone over 4G",
+          "p95 API response under 500 ms, not counting AI calls",
+          "A database index for every list and search"
+        ]
+      }
+    ],
+    "baseline": [
+      {
+        "id": "availability",
+        "title": "Availability",
+        "baseline": "An uptime check with an alert"
+      },
+      {
+        "id": "scalability",
+        "title": "Scalability",
+        "baseline": "No state kept in the app server's memory"
+      },
+      {
+        "id": "privacy",
+        "title": "Privacy and PDPA",
+        "baseline": "A privacy notice, and no personal data in logs"
+      },
+      {
+        "id": "usability",
+        "title": "Usability and accessibility",
+        "baseline": "Works on a phone; error messages say what to do"
+      },
+      {
+        "id": "maintainability",
+        "title": "Maintainability",
+        "baseline": "Every feature has acceptance tests"
+      },
+      {
+        "id": "observability",
+        "title": "Observability",
+        "baseline": "One safe log line per request"
+      },
+      {
+        "id": "cost",
+        "title": "Cost efficiency",
+        "baseline": "Know the monthly bill before it arrives"
+      }
+    ]
+  },
+  "core": {
+    "authentication": {
+      "methods": [
+        "magic",
+        "google"
+      ],
+      "options": [
+        "verify",
+        "lockout",
+        "2fa"
+      ]
+    },
+    "authorization": {
+      "deny_by_default": true,
+      "tenant_isolation": "always",
+      "tenancy": "shared",
+      "permissions": [
+        {
+          "id": "f:barcode scanner",
+          "label": "barcode scanner"
+        },
+        {
+          "id": "f:Medicine Information Lookup",
+          "label": "Medicine Information Lookup"
+        },
+        {
+          "id": "f:Medicines details page",
+          "label": "Medicines details page"
+        },
+        {
+          "id": "team",
+          "label": "Manage team and roles"
+        },
+        {
+          "id": "billing",
+          "label": "Billing and plan"
+        },
+        {
+          "id": "settings",
+          "label": "Business settings"
+        },
+        {
+          "id": "usage",
+          "label": "Usage and logs"
+        },
+        {
+          "id": "export",
+          "label": "Export data"
+        }
+      ],
+      "matrix": {
+        "Registered user": [
+          "f:barcode scanner",
+          "f:Medicine Information Lookup",
+          "f:Medicines details page",
+          "team",
+          "billing",
+          "settings",
+          "usage",
+          "export"
+        ],
+        "Pharmacist/health care professional": [],
+        "Guest User": [],
+        "System Administrator": []
+      },
+      "options": []
+    },
+    "ai_settings": null
+  },
+  "ai": null,
+  "business": {
+    "personal_data": true,
+    "payments": "both",
+    "billing": "stripe",
+    "retention": "90",
+    "launch": [
+      "privacy",
+      "terms",
+      "onboarding",
+      "support",
+      "backups",
+      "monitoring"
+    ]
+  },
+  "coding_agent": {
+    "agent": "claude",
+    "level": "ask",
+    "permission_mode": "default",
+    "extras": [
+      "hook",
+      "skill"
+    ],
+    "permissions_from": "Module 5 starter"
+  },
+  "decisions": {
+    "scope": {
+      "stage": "requirements",
+      "chosen": "must",
+      "suggested": "must"
+    },
+    "frontend": {
+      "stage": "stack",
+      "chosen": "htmx",
+      "suggested": "htmx"
+    },
+    "backend": {
+      "stage": "stack",
+      "chosen": "fastapi",
+      "suggested": "fastapi"
+    },
+    "deploy": {
+      "stage": "stack",
+      "chosen": "vps",
+      "suggested": "vps"
+    },
+    "database": {
+      "stage": "stack",
+      "chosen": "sqlite",
+      "suggested": "sqlite"
+    },
+    "tenancy": {
+      "stage": "core",
+      "chosen": "shared",
+      "suggested": "shared"
+    },
+    "billing": {
+      "stage": "saas",
+      "chosen": "stripe",
+      "suggested": "stripe"
+    },
+    "retention": {
+      "stage": "saas",
+      "chosen": "90",
+      "suggested": "90"
+    },
+    "agent": {
+      "stage": "pack",
+      "chosen": "claude",
+      "suggested": "claude"
+    }
+  },
+  "milestones": [
+    {
+      "id": "M0",
+      "title": "Skeleton",
+      "goal": "An empty app in the confirmed stack that starts, reads its settings from .env, and has one passing test.",
+      "tests": [
+        "The health route returns ok",
+        "The test command passes",
+        ".env is in .gitignore",
+        "blueprint.json is unchanged"
+      ]
+    },
+    {
+      "id": "M1",
+      "title": "Authentication",
+      "goal": "People sign in with the methods in docs/AUTH.md, from a proven library or service.",
+      "tests": [
+        "A signed-out request to a private page is refused",
+        "Sign-in and sign-out work in the provider's test mode",
+        "No password is stored in plain text, and no session token appears in a log",
+        "Sign-in works with: Email magic link",
+        "Sign-in works with: Google sign-in",
+        "An unverified email address cannot use the app",
+        "Repeated failed sign-ins are slowed down, then locked for a while",
+        "An owner or admin must pass two-factor sign-in"
+      ]
+    },
+    {
+      "id": "M2",
+      "title": "Authorization and tenants",
+      "goal": "Every business is a tenant and every user has a role; every route checks the role against the permission matrix in docs/AUTH.md, and denies by default.",
+      "tests": [
+        "Customer A cannot read or change customer B's records, on every table",
+        "A route with no permission rule is refused",
+        "Only a role allowed to manage the team can change a role",
+        "A Pharmacist/health care professional is refused: barcode scanner, Medicine Information Lookup, Medicines details page, Manage team and roles, Billing and plan, Business settings, Usage and logs, Export data",
+        "A Guest User is refused: barcode scanner, Medicine Information Lookup, Medicines details page, Manage team and roles, Billing and plan, Business settings, Usage and logs, Export data",
+        "A System Administrator is refused: barcode scanner, Medicine Information Lookup, Medicines details page, Manage team and roles, Billing and plan, Business settings, Usage and logs, Export data"
+      ]
+    },
+    {
+      "id": "M3",
+      "title": "Data model and version 1 features",
+      "goal": "The tables in docs/DATA_MODEL.md and the version 1 features in docs/REQUIREMENTS.md, until their tests in the acceptance folder pass.",
+      "tests": [
+        "Every table has a tenant id, and every query filters by it",
+        "Every acceptance test of “barcode scanner” passes (tests/acceptance/test_f1_barcode_scanner.py)",
+        "Every acceptance test of “Medicine Information Lookup” passes (tests/acceptance/test_f2_medicine_information_lookup.py)",
+        "Every acceptance test of “Medicines details page” passes (tests/acceptance/test_f3_medicines_details_page.py)"
+      ]
+    },
+    {
+      "id": "M6",
+      "title": "Quality targets",
+      "goal": "Each target in docs/QUALITY.md has a test or a scripted check that passes.",
+      "tests": [
+        "Security: Every input is validated on the server",
+        "Security: Secrets live only in environment variables, never in code, logs or the browser",
+        "Security: HTTPS only, secure cookies and CSRF protection",
+        "Security: Rate limits on sign-in and on every public route",
+        "Security: A dependency audit runs on every build (pip-audit or npm audit)",
+        "Security: Reviewed against the OWASP Top 10 before launch",
+        "Reliability: Every error gives a clear message, and nothing is left half-saved",
+        "Reliability: Calls to outside services time out and retry with back-off",
+        "Reliability: Daily backups, restored once to prove they work",
+        "Reliability: Payments and actions are idempotent: a retry never runs them twice",
+        "Performance: p95 page load under 2 seconds on a phone over 4G",
+        "Performance: p95 API response under 500 ms, not counting AI calls",
+        "Performance: A database index for every list and search"
+      ]
+    },
+    {
+      "id": "M7",
+      "title": "SaaS business",
+      "goal": "Plans with limits, billing in the provider's test mode, data retention, and the launch checklist in docs/ARCHITECTURE.md.",
+      "tests": [
+        "A payment webhook is verified before a plan changes",
+        "Usage over the plan's limit is refused with an upgrade message",
+        "Personal data older than 90 days is deleted or anonymised",
+        "The privacy notice says what you collect, why and for how long",
+        "Sign-up asks the customer to accept the terms",
+        "A new customer can sign up and finish a first task without help",
+        "The support channel is shown on every page"
+      ]
+    },
+    {
+      "id": "M8",
+      "title": "Deploy and launch",
+      "goal": "Running on the internet over HTTPS, with backups, monitoring and a pricing page.",
+      "tests": [
+        "The live site answers over HTTPS",
+        "A backup is restored once, to prove it works",
+        "An uptime alert reaches your phone"
+      ]
+    }
+  ]
+}

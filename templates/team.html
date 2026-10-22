@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Pasukan &amp; Peranan &middot; CODE4CARE{% endblock %}
+{% block page_name %}team{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Pasukan &amp; Peranan</h1>
+  <p class="lead">
+    Hanya peranan dengan kebenaran “Manage team and roles” boleh menukar peranan.
+    Setiap perubahan direkodkan dalam log penggunaan.
+  </p>
+  <div id="team-table">
+    {% include "partials/team_table.html" %}
+  </div>
+  <h2>Peranan yang tersedia</h2>
+  <ul class="bullets">
+    <li><strong>Registered user</strong>: imbas, cari, lihat butiran, urus pasukan, langganan, tetapan, log dan eksport.</li>
+    <li><strong>Pharmacist/health care professional</strong>: menyemak maklumat ubat apabila diberi akses oleh pentadbir sistem.</li>
+    <li><strong>Guest User</strong>: akses awam sahaja.</li>
+    <li><strong>System Administrator</strong>: fungsi pentadbiran sistem sahaja.</li>
+  </ul>
+</section>
+{% endblock %}

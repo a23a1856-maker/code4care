@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Semak e-mel anda &middot; CODE4CARE{% endblock %}
+{% block page_name %}login-sent{% endblock %}
+{% block content %}
+<section class="card narrow" data-state="login_sent">
+  <h1>Semak e-mel anda</h1>
+  <p class="lead">
+    Jika alamat ini berdaftar, kami telah menghantar pautan masuk. Pautan itu sah
+    selama 15 minit dan hanya boleh digunakan sekali.
+  </p>
+  <p class="muted">Tidak menerima e-mel? Semak folder spam, atau minta pautan baharu.</p>
+  {% if magic_url %}
+    <p class="notice" data-dev-magic-link="true">
+      Mod pembangunan: <a href="{{ magic_url }}">klik di sini untuk masuk</a>
+      (pautan sah 15 minit).
+    </p>
+  {% endif %}
+  <a class="button ghost" href="/login">Minta pautan baharu</a>
+</section>
+{% endblock %}

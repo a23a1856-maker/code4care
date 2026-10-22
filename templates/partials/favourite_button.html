@@ -1,0 +1,9 @@
+{% if favourite %}
+  <button class="button ghost" type="button"
+          hx-post="/favourites/{{ medicine.id }}/remove" hx-target="this" hx-swap="outerHTML"
+          data-favourite="on">Buang daripada kegemaran</button>
+{% else %}
+  <button class="button ghost" type="button"
+          hx-post="/favourites/{{ medicine.id }}" hx-target="this" hx-swap="outerHTML"
+          data-favourite="off">Simpan ke kegemaran</button>
+{% endif %}

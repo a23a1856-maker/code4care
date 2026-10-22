@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Pengesahan dua langkah &middot; CODE4CARE{% endblock %}
+{% block page_name %}two-factor{% endblock %}
+{% block content %}
+<section class="card narrow" data-state="two_factor">
+  <h1>Pengesahan dua langkah</h1>
+  <p class="lead">
+    Pemilik perniagaan dan pentadbir sistem perlu mengesahkan identiti mereka.
+    Masukkan kod enam digit yang kami hantar ke e-mel anda.
+  </p>
+
+  {% if error %}
+    <p class="alert" role="alert">{{ error }}</p>
+  {% endif %}
+
+  <form method="post" action="/login/2fa" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="code">Kod pengesahan</label>
+    <input id="code" name="code" inputmode="numeric" autocomplete="one-time-code"
+           pattern="[0-9]{6}" maxlength="6" required placeholder="000000">
+    <button class="button" type="submit">Sahkan dan masuk</button>
+  </form>
+
+  <p class="fineprint">Kod ini sah selama 5 minit. Terlalu banyak cubaan akan mengunci akaun sementara.</p>
+</section>
+{% endblock %}

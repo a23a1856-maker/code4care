@@ -1,0 +1,35 @@
+<table class="table" id="team-table">
+  <thead>
+    <tr><th>E-mel</th><th>Peranan</th><th>Status e-mel</th><th>Tukar peranan</th></tr>
+  </thead>
+  <tbody>
+    {% for member in users %}
+      <tr data-user="{{ member.id }}">
+        <td>
+          {{ member.email }}
+          {% if member.is_owner %}<span class="badge">pemilik</span>{% endif %}
+        </td>
+        <td>{{ member.role }}</td>
+        <td>
+          {% if member.email_verified %}
+            <span class="badge ok">disahkan</span>
+          {% else %}
+            <span class="badge warn">belum disahkan</span>
+          {% endif %}
+        </td>
+        <td>
+          <form class="row" hx-post="/team/{{ member.id }}/role" hx-target="#team-table"
+                hx-swap="outerHTML" method="post" action="/team/{{ member.id }}/role">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+            <select name="role" aria-label="Peranan untuk {{ member.email }}">
+              {% for role in ['Registered user', 'Pharmacist/health care professional', 'Guest User', 'System Administrator'] %}
+                <option value="{{ role }}" {% if role == member.role %}selected{% endif %}>{{ role }}</option>
+              {% endfor %}
+            </select>
+            <button class="button small" type="submit">Simpan</button>
+          </form>
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>

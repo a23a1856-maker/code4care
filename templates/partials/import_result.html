@@ -1,0 +1,61 @@
+{% if preview %}
+<section class="card" data-import="{{ 'preview' if dry_run else 'done' }}">
+  <h2>{{ 'Pratonton import' if dry_run else 'Import selesai' }}</h2>
+  <p class="hint">
+    Fail: <span class="mono">{{ file_name }}</span> &middot; {{ preview.file_kind }}
+    {% if preview.sheet_name %} &middot; helaian “{{ preview.sheet_name }}”{% endif %}
+  </p>
+
+  <ul class="summary">
+    <li><strong>{{ preview.total_rows }}</strong> baris data</li>
+    {% if counts %}
+      <li><strong>{{ counts.created }}</strong> ditambah</li>
+      <li><strong>{{ counts.updated }}</strong> dikemas kini</li>
+      <li><strong>{{ counts.unchanged }}</strong> tidak berubah</li>
+    {% else %}
+      <li><strong>{{ preview.rows|length }}</strong> sedia untuk diimport</li>
+    {% endif %}
+    <li><strong>{{ preview.problems|length }}</strong> ditolak</li>
+    {% if preview.skipped_empty %}
+      <li><strong>{{ preview.skipped_empty }}</strong> baris kosong dilangkau</li>
+    {% endif %}
+  </ul>
+
+  {% if dry_run %}
+    <p class="notice">
+      Ini pratonton sahaja &mdash; tiada data disimpan. Buang tanda
+      “Semak dahulu” dan hantar semula untuk menyimpan.
+    </p>
+  {% elif counts %}
+    <p class="notice">
+      Katalog dikemas kini. <a href="/search">Cari ubat</a> untuk menyemak hasilnya,
+      atau <a href="/catalog/import">import fail lain</a>.
+      {% if not mark_verified %}
+        Baris ini belum disahkan, jadi kegunaan dan amaran tidak dipaparkan pada
+        halaman butiran.
+      {% endif %}
+    </p>
+  {% endif %}
+
+  {% if preview.problems %}
+    <h3>Baris yang ditolak</h3>
+    <table class="table">
+      <thead><tr><th>Baris</th><th>Sebab</th></tr></thead>
+      <tbody>
+        {% for problem in preview.problems[:100] %}
+          <tr><td>{{ problem.line }}</td><td>{{ problem.message }}</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% if preview.problems|length > 100 %}
+      <p class="hint">&hellip; dan {{ preview.problems|length - 100 }} baris lagi.</p>
+    {% endif %}
+  {% endif %}
+
+  {% if preview.unknown_columns %}
+    <p class="hint">
+      Kolum tidak dikenali (diabaikan): {{ preview.unknown_columns|join(', ') }}.
+    </p>
+  {% endif %}
+</section>
+{% endif %}

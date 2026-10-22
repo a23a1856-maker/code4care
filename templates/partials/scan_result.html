@@ -1,0 +1,40 @@
+{% if error_code %}
+<section class="card error" data-error="{{ error_code }}" role="alert">
+  <h2>Kod bar tidak dapat diproses</h2>
+  <p>{{ error_message }}</p>
+  <p class="hint">Taip kod bar secara manual di atas, atau <a href="/search">cari mengikut nama ubat</a>.</p>
+</section>
+{% else %}
+<section class="card result" data-scan="saved" data-found="{{ 'yes' if medicine else 'no' }}">
+  {% if medicine %}
+    {% if has_image %}
+      <img class="scan-photo" src="/medicines/{{ medicine.id }}/image?v={{ image_version }}"
+           alt="Gambar {{ medicine.name }}" width="160" height="120" loading="lazy">
+    {% endif %}
+    <h2 data-found="yes">{{ medicine.name }}</h2>
+    <p class="lead">
+      {{ medicine.brand }} &middot; {{ medicine.strength }} &middot; {{ medicine.dosage_form }}
+    </p>
+    <p class="muted">Bahan aktif: {{ medicine.active_ingredient }}</p>
+    {% if medicine.verified %}
+      <p>{{ medicine.uses }}</p>
+      <p class="verified" data-verified="true">Maklumat disahkan &middot; {{ medicine.source }}</p>
+    {% else %}
+      <p class="unverified" data-verified="false">
+        Maklumat ubat ini <strong>belum disahkan</strong>. Sila rujuk bungkusan asal atau ahli farmasi.
+      </p>
+    {% endif %}
+    <a class="button" href="/medicines/{{ medicine.id }}">Lihat butiran penuh</a>
+  {% else %}
+    <h2 data-empty="no_match">Tiada rekod untuk kod bar {{ barcode }}</h2>
+    <p class="lead">
+      Kod bar ini tiada dalam katalog perniagaan anda. Imbasan tetap disimpan dalam sejarah.
+    </p>
+    <p class="hint">
+      Taip kod bar yang lain, atau <a href="/search">cari mengikut nama ubat</a>.
+      Jika ubat ini baharu bagi anda, tambahkannya dalam katalog perniagaan.
+    </p>
+  {% endif %}
+  <p class="fineprint">Imbasan disimpan untuk perniagaan anda sahaja (rekod #{{ scan_id }}).</p>
+</section>
+{% endif %}

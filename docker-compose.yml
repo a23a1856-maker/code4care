@@ -1,0 +1,36 @@
+services:
+  app:
+    build: .
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      DATABASE_PATH: /srv/code4care/data/code4care.db
+      ENVIRONMENT: production
+      BASE_URL: ${BASE_URL:-https://code4care.example}
+    volumes:
+      - ./data:/srv/code4care/data
+      - ./backups:/srv/code4care/backups
+    ports:
+      - "127.0.0.1:8000:8000"
+
+  # Daily database backup, written next to the app and kept for 14 days.
+  backup:
+    image: python:3.12-slim
+    restart: unless-stopped
+    depends_on:
+      - app
+    working_dir: /srv/code4care
+    command: >
+      sh -c "while true; do
+        python -m scripts.backup --source /srv/code4care/data/code4care.db
+        --destination /srv/code4care/backups/
+        --media /srv/code4care/data/medicine-images || true;
+        find /srv/code4care/backups -name '*.db*' -mtime +14 -delete;
+        sleep 86400;
+      done"
+    volumes:
+      - ./data:/srv/code4care/data
+      - ./backups:/srv/code4care/backups
+      - ./scripts:/srv/code4care/scripts
+      - ./app:/srv/code4care/app

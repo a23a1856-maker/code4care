@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Masuk &middot; CODE4CARE{% endblock %}
+{% block page_name %}login{% endblock %}
+{% block content %}
+<section class="card narrow">
+  <h1>Masuk ke CODE4CARE</h1>
+  <p class="lead">Kami menghantar pautan sekali guna ke e-mel anda. Tiada kata laluan untuk diingat.</p>
+
+  {% if error %}
+    <p class="alert" role="alert">{{ error }}</p>
+  {% endif %}
+
+  {% if dev_accounts %}
+    <div class="dev-panel" data-dev-sign-in="true">
+      <h2>Masuk pantas (pembangunan)</h2>
+      <p class="hint">
+        Satu klik, tanpa e-mel dan tanpa pengesahan dua langkah. Pilihan ini hanya
+        muncul apabila <code>ENVIRONMENT=development</code>.
+      </p>
+      {% for account in dev_accounts %}
+        <form method="post" action="/dev/login">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <input type="hidden" name="email" value="{{ account.email }}">
+          <button class="button ghost full dev-account" type="submit">
+            <span class="dev-account-email">{{ account.email }}</span>
+            <span class="dev-account-role">{{ account.role }}</span>
+          </button>
+        </form>
+      {% endfor %}
+    </div>
+    <div class="divider"><span>atau guna e-mel</span></div>
+  {% endif %}
+
+  <form method="post" action="/login" class="stack">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="email">Alamat e-mel</label>
+    <input id="email" name="email" type="email" autocomplete="email" required
+           placeholder="nama@farmasi.my" maxlength="254">
+    <button class="button" type="submit">Hantar pautan masuk</button>
+  </form>
+
+  <div class="divider"><span>atau</span></div>
+
+  <a class="button ghost full" href="/auth/google">Teruskan dengan Google</a>
+
+  <p class="fineprint">
+    Dengan masuk, anda bersetuju dengan <a href="/terms">terma perkhidmatan</a> dan
+    <a href="/privacy">notis privasi</a> kami.
+  </p>
+</section>
+{% endblock %}

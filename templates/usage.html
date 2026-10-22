@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Penggunaan &amp; Log &middot; CODE4CARE{% endblock %}
+{% block page_name %}usage{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="card-head">
+    <h1>Penggunaan &amp; Log</h1>
+    <a class="link" href="/export/scans.csv">Eksport imbasan</a>
+  </div>
+  <p class="lead">
+    Log ini tidak mengandungi teks mesej pelanggan atau alamat IP. Ia merekodkan
+    tindakan penting dalam perniagaan anda sahaja.
+  </p>
+  {% if entries %}
+    <table class="table">
+      <thead><tr><th>Tarikh</th><th>Tindakan</th><th>Butiran</th><th>Pengguna</th></tr></thead>
+      <tbody>
+        {% for entry in entries %}
+          <tr>
+            <td><time datetime="{{ entry.created_at }}">{{ entry.created_at[:16]|replace('T', ' ') }}</time></td>
+            <td class="mono">{{ entry.action }}</td>
+            <td>{{ entry.detail }}</td>
+            <td>{{ entry.user_id or 'sistem' }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">Belum ada aktiviti direkodkan.</p>
+  {% endif %}
+</section>
+{% endblock %}

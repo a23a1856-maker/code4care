@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Cari Ubat &middot; CODE4CARE{% endblock %}
+{% block page_name %}search{% endblock %}
+{% block content %}
+<section class="card">
+  <p class="eyebrow">F2 &middot; Carian maklumat ubat</p>
+  <h1>Cari Ubat</h1>
+  <p class="lead">
+    Masukkan kod bar yang telah diimbas, atau nama, jenama atau bahan aktif ubat.
+    Carian hanya merangkumi katalog perniagaan anda.
+  </p>
+
+  <form class="stack" method="post" action="/search"
+        hx-post="/search" hx-target="#search-results" hx-swap="innerHTML">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="q">Kod bar, nama atau bahan aktif</label>
+    <div class="row">
+      <input id="q" name="q" autocomplete="off" maxlength="64" required
+             placeholder="Contoh: Paracetamol atau 9550010000013" autofocus>
+      <button class="button" type="submit">Cari</button>
+    </div>
+  </form>
+
+  <form class="stack compact" method="post" action="/lookup/barcode"
+        hx-post="/lookup/barcode" hx-target="#search-results" hx-swap="innerHTML">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="request_id" id="lookup-request-id" value="">
+    <label for="barcode-lookup">Cari terus menggunakan kod bar yang diimbas</label>
+    <div class="row">
+      <input id="barcode-lookup" name="barcode" inputmode="numeric" maxlength="32"
+             placeholder="Kod bar 8, 12 atau 13 digit">
+      <button class="button ghost" type="submit">Cari kod bar</button>
+    </div>
+  </form>
+
+  <div id="search-results" aria-live="polite"></div>
+  <p class="fineprint">
+    Setiap carian kod bar disimpan dalam sejarah perniagaan anda supaya laporan
+    penggunaan dan eksport data kekal tepat.
+  </p>
+</section>
+{% endblock %}

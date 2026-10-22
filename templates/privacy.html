@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}Notis Privasi &middot; CODE4CARE{% endblock %}
+{% block page_name %}privacy{% endblock %}
+{% block content %}
+<section class="card narrow prose">
+  <h1>Notis Privasi (PDPA)</h1>
+  <p class="lead">Kemas kini: 22 Oktober 2026</p>
+
+  <h2>Maklumat yang kami kumpul</h2>
+  <ul class="bullets">
+    <li><strong>Identiti:</strong> alamat e-mel staf yang mendaftar, dan peranan mereka.</li>
+    <li><strong>Aktiviti:</strong> kod bar yang diimbas atau dicari, masa imbasan dan ubat yang dibuka.</li>
+    <li><strong>Teknikal:</strong> satu baris log setiap permintaan tanpa teks mesej dan tanpa alamat IP.</li>
+  </ul>
+
+  <h2>Mengapa kami memerlukannya</h2>
+  <p>
+    Untuk memastikan hanya staf yang sah boleh mengakses perniagaan anda, untuk
+    menyediakan sejarah imbasan dan eksport data, dan untuk melindungi akaun
+    daripada penyalahgunaan.
+  </p>
+
+  <h2>Berapa lama kami menyimpannya</h2>
+  <p>
+    Data peribadi disimpan tidak melebihi <strong>90 hari</strong>, kemudian dipadam
+    atau dinyahkenal pasti. Anda boleh meminta salinan atau pemadaman lebih awal.
+  </p>
+
+  <h2>Perkongsian</h2>
+  <p>
+    Kami tidak menjual data. E-mel dihantar melalui pembekal e-mel, dan log masuk
+    Google melalui Google. Pembekal pembayaran memegang butiran kad; kami hanya
+    menyimpan ID pelanggan mereka.
+  </p>
+
+  <h2>Hak anda</h2>
+  <p>
+    Hubungi <a href="mailto:{{ support_email }}">{{ support_email }}</a> untuk
+    mengakses, membetulkan atau memadam data anda. Jika berlaku kebocoran data yang
+    berisiko, kami akan memberitahu anda dan pihak berkuasa yang berkaitan secepat mungkin.
+  </p>
+</section>
+{% endblock %}

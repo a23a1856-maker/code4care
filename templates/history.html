@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Sejarah Imbasan &middot; CODE4CARE{% endblock %}
+{% block page_name %}history{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="card-head">
+    <h1>Sejarah Imbasan</h1>
+    <a class="link" href="/export/scans.csv">Eksport CSV</a>
+  </div>
+  <p class="lead">Imbasan dan carian kod bar untuk perniagaan anda sahaja.</p>
+
+  {% if scans %}
+    <table class="table">
+      <thead>
+        <tr><th>Tarikh</th><th>Kod bar</th><th>Ubat</th><th>Sumber</th></tr>
+      </thead>
+      <tbody>
+        {% for scan in scans %}
+          <tr>
+            <td><time datetime="{{ scan.created_at }}">{{ scan.created_at[:16]|replace('T', ' ') }}</time></td>
+            <td class="mono">{{ scan.barcode }}</td>
+            <td>
+              {% if scan.medicine_name %}
+                <a href="/medicines/{{ scan.medicine_id }}">{{ scan.medicine_name }}</a>
+              {% else %}
+                <span class="muted">Tiada padanan</span>
+              {% endif %}
+            </td>
+            <td>{{ 'Kamera' if scan.source == 'camera' else 'Carian' }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  {% else %}
+    <p class="muted">Belum ada imbasan. <a href="/scan">Imbas ubat pertama anda</a>.</p>
+  {% endif %}
+</section>
+{% endblock %}

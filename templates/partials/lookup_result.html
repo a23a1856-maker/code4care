@@ -1,0 +1,32 @@
+{% if error_code %}
+<section class="card error" data-error="{{ error_code }}" role="alert">
+  <h2>Carian tidak dapat dijalankan</h2>
+  <p>{{ error_message }}</p>
+</section>
+{% elif results %}
+<section class="card" data-lookup="found">
+  <h2>{{ results|length }} ubat dijumpai</h2>
+  <ul class="list">
+    {% for medicine in results %}
+      <li>
+        {% if with_images and medicine.id in with_images %}
+          <img class="thumb" src="/medicines/{{ medicine.id }}/image" alt="" loading="lazy" width="48" height="48">
+        {% endif %}
+        <a href="/medicines/{{ medicine.id }}">{{ medicine.name }}</a>
+        <span class="muted">{{ medicine.brand }} &middot; {{ medicine.strength }} &middot; {{ medicine.dosage_form }}</span>
+        <span class="mono">{{ medicine.barcode }}</span>
+        {% if not medicine.verified %}<span class="badge warn">belum disahkan</span>{% endif %}
+      </li>
+    {% endfor %}
+  </ul>
+</section>
+{% else %}
+<section class="card" data-lookup="not_found">
+  <h2>Tiada ubat dijumpai</h2>
+  <p class="lead">
+    Tiada padanan untuk <span class="mono">{{ barcode or query }}</span> dalam katalog
+    perniagaan anda.
+  </p>
+  <p class="hint">Semak ejaan, cuba nama bahan aktif, atau imbas kod bar semula.</p>
+</section>
+{% endif %}

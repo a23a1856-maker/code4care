@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Tetapan Perniagaan &middot; CODE4CARE{% endblock %}
+{% block page_name %}settings{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Tetapan Perniagaan</h1>
+  <dl class="details">
+    <div><dt>Nama perniagaan</dt><dd>{{ tenant.name if tenant else tenant_name }}</dd></div>
+    <div><dt>Pelan</dt><dd>{{ tenant.plan if tenant else 'trial' }}</dd></div>
+    <div><dt>Pengekalan data peribadi</dt><dd>90 hari (PDPA)</dd></div>
+    <div><dt>Katalog ubat</dt><dd>Setiap perniagaan mempunyai salinan katalog sendiri.</dd></div>
+  </dl>
+  <p class="fineprint">
+    Untuk menukar nama perniagaan, tukar pelan atau memadam data, hubungi
+    <a href="mailto:{{ support_email }}">{{ support_email }}</a>.
+    Permintaan pemadanan data diproses dalam 7 hari bekerja.
+  </p>
+  <p><a class="link" href="/privacy">Baca notis privasi</a></p>
+</section>
+{% endblock %}

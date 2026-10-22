@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Label Ujian &middot; CODE4CARE{% endblock %}
+{% block page_name %}test-labels{% endblock %}
+{% block content %}
+<section class="card no-print">
+  <p class="eyebrow">Untuk ujian</p>
+  <h1>Label Ujian</h1>
+  <p class="lead">
+    Tiada kotak ubat di tangan? Setiap kad di bawah mempunyai kod bar dan kod QR
+    yang membawa kod produk yang sama. Buka halaman ini pada skrin lain (atau
+    cetak), kemudian imbas dengan kamera pada halaman Imbas Ubat.
+  </p>
+  <ol class="bullets">
+    <li>Buka <a href="/scan">Imbas Ubat</a> pada telefon atau tab lain.</li>
+    <li>Tekan “Mulakan kamera” dan benarkan akses kamera.</li>
+    <li>Halakan kamera pada kod bar atau kod QR di bawah.</li>
+  </ol>
+  <p class="hint">
+    Kod QR mengandungi kod produk sahaja (contoh <span class="mono">9550010000015</span>
+    atau <span class="mono">C4C-0001</span>), bukan URL. Kod EAN-13 boleh diimbas
+    terus; kod dalaman hanya ditemui jika ia ada dalam katalog perniagaan anda.
+  </p>
+  <div class="actions">
+    <button class="button" type="button" data-print>Cetak label</button>
+    <a class="button ghost" href="/scan">Buka pengimbas</a>
+  </div>
+  <p class="hint">
+    {{ total }} ubat dalam katalog &middot; halaman {{ page }} daripada {{ pages }}
+    ({{ items|length }} kad).
+  </p>
+</section>
+
+<section class="label-grid">
+  {% for item in items %}
+    <article class="label-card" data-label="{{ item.code }}">
+      <h2>{{ item.medicine.name }}</h2>
+      <p class="label-meta">
+        {{ item.medicine.strength }}{% if item.medicine.dosage_form %} &middot; {{ item.medicine.dosage_form }}{% endif %}
+        &middot; {{ item.kind }}
+      </p>
+      <div class="label-barcode">{{ item.barcode_svg|safe }}</div>
+      <div class="label-qr">{{ item.qr_svg|safe }}</div>
+      <p class="label-code mono">{{ item.code }}</p>
+    </article>
+  {% endfor %}
+</section>
+
+{% if pages > 1 %}
+  <nav class="pager no-print" aria-label="Halaman label">
+    {% if page > 1 %}
+      <a class="button ghost" href="/labels/test?page={{ page - 1 }}">Sebelum</a>
+    {% endif %}
+    <span>Halaman {{ page }} / {{ pages }}</span>
+    {% if page < pages %}
+      <a class="button ghost" href="/labels/test?page={{ page + 1 }}">Seterusnya</a>
+    {% endif %}
+  </nav>
+{% endif %}
+{% endblock %}

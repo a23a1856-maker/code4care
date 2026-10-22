@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="ms">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}CODE4CARE{% endblock %}</title>
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <link rel="icon" href="/static/favicon.svg?v=20261022j" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/app.css?v=20261022j">
+  <script src="/static/vendor/htmx.min.js?v=20261022j" defer></script>
+  <script src="/static/app.js?v=20261022j" defer></script>
+</head>
+<body data-page="{% block page_name %}page{% endblock %}">
+  <a class="skip-link" href="#main">Langkau ke kandungan</a>
+  <header class="topbar">
+    <a class="brand" href="/">
+      <span class="brand-mark" aria-hidden="true">C4C</span>
+      <span class="brand-text">CODE4CARE<small>Maklumat ubat, pantas dan tepat</small></span>
+    </a>
+    {% if user %}
+      <nav class="nav" aria-label="Navigasi utama">
+        {% for item in nav %}
+          <a href="{{ item.path }}">{{ item.label }}</a>
+        {% endfor %}
+      </nav>
+      <div class="account">
+        <span class="account-name">{{ user.email }}</span>
+        <span class="badge">{{ role_label }}</span>
+        <form method="post" action="/logout" class="inline">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+          <button type="submit" class="link-button">Keluar</button>
+        </form>
+      </div>
+    {% else %}
+      <a class="button small" href="/login">Masuk</a>
+    {% endif %}
+  </header>
+
+  <main id="main" class="page">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="footer">
+    <p>
+      Perlu bantuan? E-mel
+      <a href="mailto:{{ support_email }}">{{ support_email }}</a>
+      atau WhatsApp
+      <a href="https://wa.me/{{ support_whatsapp|replace('+', '')|replace(' ', '') }}">{{ support_whatsapp }}</a>.
+    </p>
+    <p><a href="/privacy">Notis privasi (PDPA)</a> &middot; <a href="/terms">Terma perkhidmatan</a></p>
+    <p class="fineprint">
+      Maklumat ubat di CODE4CARE adalah rujukan sahaja dan bukan pengganti nasihat doktor
+      atau ahli farmasi. Jika simptom berterusan, dapatkan rawatan.
+    </p>
+  </footer>
+</body>
+</html>

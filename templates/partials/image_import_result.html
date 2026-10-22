@@ -1,0 +1,45 @@
+<section class="card" data-image-import="done">
+  <h2>Gambar diimport</h2>
+  <ul class="summary">
+    <li><strong>{{ report.saved }}</strong> gambar disimpan</li>
+    <li><strong>{{ report.unmatched|length }}</strong> tidak sepadan</li>
+    <li><strong>{{ report.skipped|length }}</strong> dilangkau</li>
+    <li><strong>{{ report.total }}</strong> fail dalam ZIP</li>
+  </ul>
+
+  {% if report.saved %}
+    <p class="notice">
+      Gambar dipaparkan pada halaman butiran ubat, hasil carian dan kad imbasan.
+    </p>
+  {% else %}
+    <p class="hint">
+      Tiada gambar disimpan. Namakan setiap fail mengikut kod bar ubat, contoh
+      <span class="mono">9550010000015.jpg</span> atau
+      <span class="mono">C4C-0003.jpg</span>.
+    </p>
+  {% endif %}
+
+  {% if report.unmatched %}
+    <h3>Tidak sepadan dengan katalog</h3>
+    <p class="hint">
+      Nama fail mesti sama dengan kod bar. Ini yang tidak ditemui:
+    </p>
+    <ul class="bullets mono small">
+      {% for name in report.unmatched[:40] %}<li>{{ name }}</li>{% endfor %}
+    </ul>
+    {% if report.unmatched|length > 40 %}
+      <p class="hint">&hellip; dan {{ report.unmatched|length - 40 }} lagi.</p>
+    {% endif %}
+  {% endif %}
+
+  {% if report.skipped %}
+    <h3>Dilangkau</h3>
+    <p class="hint">Bukan gambar yang sah, terlalu besar, atau format tidak disokong:</p>
+    <ul class="bullets mono small">
+      {% for name in report.skipped[:40] %}<li>{{ name }}</li>{% endfor %}
+    </ul>
+    {% if report.skipped|length > 40 %}
+      <p class="hint">&hellip; dan {{ report.skipped|length - 40 }} lagi.</p>
+    {% endif %}
+  {% endif %}
+</section>

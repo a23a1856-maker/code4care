@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block title %}{{ medicine.name }} &middot; CODE4CARE{% endblock %}
+{% block page_name %}medicine{% endblock %}
+{% block content %}
+<div class="medicine-layout">
+  {% include "partials/medicine_image.html" %}
+  <section class="card medicine" data-verified="{{ 'true' if medicine.verified else 'false' }}">
+  <p class="eyebrow">F3 &middot; Butiran ubat</p>
+  <h1 data-field="name">{{ medicine.name }}</h1>
+  <p class="lead">
+    <span data-field="brand">{{ medicine.brand }}</span> &middot;
+    <span data-field="strength">{{ medicine.strength }}</span> &middot;
+    <span data-field="dosage_form">{{ medicine.dosage_form }}</span>
+    {% if medicine.category %}&middot; <span class="badge">{{ medicine.category }}</span>{% endif %}
+  </p>
+
+  {% if medicine.verified %}
+    <p class="verified" data-verified="true">
+      Maklumat disahkan &middot; Sumber: {{ medicine.source }}
+      {% if medicine.verified_at %}&middot; {{ medicine.verified_at[:10] }}{% endif %}
+    </p>
+  {% else %}
+    <p class="unverified" role="status" data-verified="false">
+      Maklumat ubat ini <strong>belum disahkan</strong>. Kami memaparkan butiran asas
+      sahaja dan tidak menyenaraikan kegunaan, dos atau amaran sehingga ia disemak.
+      Sila rujuk bungkusan asal atau ahli farmasi.
+    </p>
+  {% endif %}
+
+  <dl class="details">
+    <div><dt>Nama</dt><dd data-field="name">{{ medicine.name }}</dd></div>
+    <div><dt>Jenama</dt><dd data-field="brand">{{ medicine.brand }}</dd></div>
+    <div><dt>Bahan aktif</dt><dd data-field="active_ingredient">{{ medicine.active_ingredient }}</dd></div>
+    <div><dt>Kekuatan</dt><dd data-field="strength">{{ medicine.strength }}</dd></div>
+    <div><dt>Bentuk dos</dt><dd data-field="dosage_form">{{ medicine.dosage_form }}</dd></div>
+    <div><dt>Pengeluar</dt><dd data-field="manufacturer">{{ medicine.manufacturer }}</dd></div>
+    <div><dt>Kod bar</dt><dd class="mono" data-field="barcode">{{ medicine.barcode }}</dd></div>
+  </dl>
+
+  {% if medicine.verified %}
+    <div class="blocks">
+      <section>
+        <h2>Kegunaan</h2>
+        <p>{{ medicine.uses }}</p>
+      </section>
+      <section>
+        <h2>Cara pengambilan</h2>
+        <p>{{ medicine.dosage_instructions }}</p>
+      </section>
+      <section class="warning">
+        <h2>Amaran keselamatan</h2>
+        <p>{{ medicine.warnings }}</p>
+      </section>
+      {% if medicine.side_effects %}
+        <section>
+          <h2>Kesan sampingan</h2>
+          <p>{{ medicine.side_effects }}</p>
+        </section>
+      {% endif %}
+      {% if medicine.storage %}
+        <section>
+          <h2>Penyimpanan</h2>
+          <p>{{ medicine.storage }}</p>
+        </section>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {% if extra_items %}
+    <section class="catalog-meta">
+      <h2>Maklumat katalog</h2>
+      <dl class="details">
+        {% for item in extra_items %}
+          <div><dt>{{ item.label }}</dt><dd>{{ item.value }}</dd></div>
+        {% endfor %}
+      </dl>
+    </section>
+  {% endif %}
+
+  <div class="actions">
+    {% include "partials/favourite_button.html" %}
+    <a class="button ghost" href="/scan">Imbas ubat lain</a>
+    <a class="button ghost" href="/search">Cari ubat</a>
+  </div>
+
+  <p class="fineprint">
+    Maklumat ini untuk rujukan staf farmasi. Nasihat kepada pelanggan mesti
+    mengambil kira keadaan individu, kehamilan, alahan dan ubat lain yang diambil.
+  </p>
+  </section>
+  </div>
+  {% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Kegemaran &middot; CODE4CARE{% endblock %}
+{% block page_name %}favourites{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Kegemaran</h1>
+  <p class="lead">Ubat yang anda simpan untuk rujukan pantas semasa melayan pelanggan.</p>
+
+  {% if favourites %}
+    <ul class="list">
+      {% for item in favourites %}
+        <li>
+          <a href="/medicines/{{ item.medicine_id }}">{{ item.medicine_name }}</a>
+          <span class="muted">{{ item.strength }}</span>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p class="muted">
+      Belum ada kegemaran. Buka butiran ubat dan tekan “Simpan ke kegemaran”.
+    </p>
+  {% endif %}
+</section>
+{% endblock %}

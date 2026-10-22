@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Imbas Ubat &middot; CODE4CARE{% endblock %}
+{% block page_name %}scan{% endblock %}
+{% block content %}
+<section class="card">
+  <div class="card-head">
+    <div>
+      <p class="eyebrow">F1 &middot; Pengimbas kod bar</p>
+      <h1>Imbas Ubat</h1>
+    </div>
+    <a class="link" href="/search">Cari secara manual</a>
+  </div>
+  <p class="lead">
+    Letakkan kod bar pada kotak ubat di dalam ruang imbasan. Kamera hanya digunakan
+    selepas anda membenarkannya, dan imej tidak dihantar ke pelayan.
+  </p>
+
+  <div class="scanner">
+    <div class="video-frame">
+      <video id="camera" playsinline muted aria-label="Pratonton kamera"></video>
+      <div class="reticle" aria-hidden="true"></div>
+      <div class="video-status" id="scan-status" data-status="idle">
+        Kamera belum dimulakan.
+      </div>
+    </div>
+    <div class="scanner-actions">
+      <button class="button" type="button" id="start-camera">Mulakan kamera</button>
+      <button class="button ghost" type="button" id="stop-camera" hidden>Hentikan kamera</button>
+    </div>
+  </div>
+
+  <form id="scan-form" class="stack" method="post" action="/scan/lookup"
+        hx-post="/scan/lookup" hx-target="#scan-result" hx-swap="innerHTML"
+        hx-indicator="#scan-busy">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <input type="hidden" name="request_id" id="request-id" value="">
+    <label for="barcode-input">Kod bar ubat</label>
+    <div class="row">
+      <input id="barcode-input" name="barcode" inputmode="numeric" autocomplete="off"
+             autocapitalize="characters" maxlength="32" placeholder="Contoh: 9550010000013"
+             required autofocus>
+      <button class="button" type="submit">Semak</button>
+    </div>
+    <p class="hint">
+      Boleh juga guna pembaca kod bar USB: letakkan kursor dalam medan ini dan imbas.
+    </p>
+    <p class="busy" id="scan-busy" aria-live="polite">Menyemak&hellip;</p>
+  </form>
+
+  <div id="scan-result" aria-live="polite"></div>
+</section>
+
+<section class="card ghost-card">
+  <h2>Jika kod bar tidak dijumpai</h2>
+  <ul class="bullets">
+    <li>Pastikan kod bar tidak kabur atau terlipat.</li>
+    <li>Taip 8, 12 atau 13 digit kod bar secara manual di atas.</li>
+    <li>Atau <a href="/search">cari mengikut nama ubat</a> dalam katalog perniagaan anda.</li>
+    <li>Tiada kotak ubat untuk diuji? Buka <a href="/labels/test">label ujian</a> dan imbas skrin itu.</li>
+  </ul>
+</section>
+{% endblock %}

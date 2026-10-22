@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% block title %}Import Katalog &middot; CODE4CARE{% endblock %}
+{% block page_name %}catalog-import{% endblock %}
+{% block content %}
+<section class="card">
+  <p class="eyebrow">Katalog ubat</p>
+  <h1>Import Katalog</h1>
+  <p class="lead">
+    Muat naik fail Excel (<code>.xlsx</code>) atau CSV untuk menambah atau
+    mengemas kini katalog ubat perniagaan anda. Baris sedia ada dipadankan
+    melalui kod bar, jadi mengimport fail yang sama dua kali tidak menghasilkan
+    pendua.
+  </p>
+
+  {% if error %}
+    <p class="alert" role="alert">{{ error }}</p>
+  {% endif %}
+
+  <form class="stack" method="post" action="/catalog/import" enctype="multipart/form-data"
+        hx-post="/catalog/import" hx-target="#import-result" hx-swap="innerHTML"
+        hx-encoding="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+
+    <label for="file">Fail katalog (.xlsx atau .csv, maksimum 5 MB)</label>
+    <input id="file" name="file" type="file" accept=".xlsx,.csv,text/csv" required>
+
+    <label for="source">Sumber katalog (pilihan)</label>
+    <input id="source" name="source" maxlength="120"
+           placeholder="Contoh: Katalog pembekal Jun 2026">
+
+    <label class="check">
+      <input type="checkbox" name="verified" value="1">
+      Tandakan baris yang diimport sebagai disahkan
+    </label>
+    <p class="hint">
+      Hanya baris yang disahkan memaparkan kegunaan, dos dan amaran pada halaman
+      butiran. Tandakan hanya jika katalog ini telah disemak oleh ahli farmasi.
+    </p>
+
+    <label class="check">
+      <input type="checkbox" name="dry_run" value="1">
+      Semak dahulu tanpa menyimpan
+    </label>
+
+    <div class="row">
+      <button class="button" type="submit">Import katalog</button>
+      <a class="button ghost" href="/catalog/template.xlsx">Muat turun templat .xlsx</a>
+    </div>
+  </form>
+
+  <div id="import-result" aria-live="polite"></div>
+</section>
+
+<section class="card ghost-card">
+  <h2>Gambar ubat (ZIP)</h2>
+  <p class="lead">
+    Letakkan gambar dalam satu fail ZIP. Nama setiap fail mesti sama dengan kod bar
+    ubat: <span class="mono">9550010000015.jpg</span> atau
+    <span class="mono">C4C-0003.jpg</span>. Subfolder seperti
+    <span class="mono">img/C4C-0003.jpg</span> juga diterima.
+  </p>
+  <form class="stack" method="post" action="/catalog/images" enctype="multipart/form-data"
+        hx-post="/catalog/images" hx-target="#image-import-result" hx-swap="innerHTML"
+        hx-encoding="multipart/form-data">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
+    <label for="zip">Fail ZIP gambar (maksimum 25 MB, 300 fail)</label>
+    <input id="zip" name="file" type="file" accept=".zip,application/zip" required>
+    <button class="button" type="submit">Import gambar</button>
+  </form>
+  <p class="hint">
+    JPG, PNG atau WebP. Setiap gambar dikecilkan kepada 1200 piksel dan metadata
+    (termasuk lokasi GPS) dibuang. Satu gambar juga boleh dimuat naik terus pada
+    halaman butiran ubat.
+  </p>
+  <div id="image-import-result" aria-live="polite"></div>
+</section>
+
+<section class="card ghost-card">
+  <h2>Kolum yang dikenali</h2>
+  <p class="hint">Susunan kolum tidak penting. Nama kolum ini dibaca:</p>
+  <table class="table">
+    <thead><tr><th>Kolum</th><th>Wajib</th><th>Maksud</th></tr></thead>
+    <tbody>
+      {% for column, required, hint in columns %}
+        <tr>
+          <td class="mono">{{ column }}</td>
+          <td>{{ 'Ya' if required else '—' }}</td>
+          <td>{{ hint }}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="hint">
+    Kolum tambahan turut dibaca jika ada: <span class="mono">regClass, regNo,
+    holder, origin, halal, image, verified, source</span>. Kod bar mesti EAN/UPC
+    untuk diimbas kamera; kod dalaman seperti <span class="mono">C4C-0001</span>
+    boleh dicari tetapi tidak boleh diimbas.
+  </p>
+</section>
+{% endblock %}

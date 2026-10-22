@@ -1,0 +1,12 @@
+.env
+.env.*
+!.env.example
+data/
+*.db
+.claude/settings.local.json
+.venv/
+__pycache__/
+.pytest_cache/
+backups/
+*.log
+logs-server.txt

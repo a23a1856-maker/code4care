@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}CODE4CARE &middot; Maklumat ubat melalui kod bar{% endblock %}
+{% block page_name %}home{% endblock %}
+{% block content %}
+{% if user %}
+  <section class="hero">
+    <div>
+      <p class="eyebrow">{{ tenant_name }}</p>
+      <h1>Selamat kembali</h1>
+      <p class="lead">
+        Imbas kod bar ubat untuk melihat nama, bahan aktif, kekuatan, bentuk dos,
+        kegunaan dan amaran apabila maklumat yang disahkan tersedia.
+      </p>
+    </div>
+    <div class="hero-actions">
+      {% if nav %}
+        <a class="button" href="/scan">Imbas Ubat</a>
+        <a class="button ghost" href="/search">Cari mengikut kod bar atau nama</a>
+      {% endif %}
+    </div>
+  </section>
+
+  <section class="grid">
+    {% for item in nav[:4] %}
+      <a class="tile" href="{{ item.path }}">
+        <span class="tile-label">{{ item.label }}</span>
+        <span class="tile-hint">Buka</span>
+      </a>
+    {% endfor %}
+  </section>
+
+  {% if not nav %}
+    <section class="card">
+      <h2>Peranan anda belum mempunyai akses</h2>
+      <p class="lead">
+        Peranan <strong>{{ role_label }}</strong> tidak dibenarkan menggunakan ciri
+        versi 1. Hubungi pemilik perniagaan untuk menukar peranan anda, atau
+        <a href="mailto:{{ support_email }}">hubungi sokongan</a>.
+      </p>
+    </section>
+  {% endif %}
+
+  <section class="card">
+    <div class="card-head">
+      <h2>Imbasan terakhir</h2>
+      <a class="link" href="/history">Lihat semua</a>
+    </div>
+    {% if recent %}
+      <ul class="list">
+        {% for scan in recent %}
+          <li>
+            <span class="mono">{{ scan.barcode }}</span>
+            {% if scan.medicine_name %}
+              <a href="/medicines/{{ scan.medicine_id }}">{{ scan.medicine_name }}</a>
+            {% else %}
+              <span class="muted">Tiada padanan</span>
+            {% endif %}
+            <time datetime="{{ scan.created_at }}">{{ scan.created_at[:16]|replace('T', ' ') }}</time>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      {% if nav %}
+        <p class="muted">Belum ada imbasan. Mulakan dengan butang “Imbas Ubat”.</p>
+      {% else %}
+        <p class="muted">Tiada imbasan untuk peranan anda.</p>
+      {% endif %}
+    {% endif %}
+  </section>
+{% else %}
+  <section class="hero landing">
+    <div>
+      <p class="eyebrow">Untuk farmasi komuniti di Malaysia</p>
+      <h1>Jawab soalan pelanggan tentang ubat, dengan yakin.</h1>
+      <p class="lead">
+        CODE4CARE membantu staf farmasi mengenal pasti ubat melalui kod bar dan
+        memberikan maklumat yang jelas serta disahkan: kegunaan, cara pengambilan
+        dan amaran keselamatan.
+      </p>
+      <div class="hero-actions">
+        <a class="button" href="/login">Masuk ke CODE4CARE</a>
+      </div>
+      <p class="fineprint">
+        Log masuk menggunakan pautan e-mel atau akaun Google. Tiada kata laluan disimpan.
+      </p>
+    </div>
+    <div class="card steps">
+      <h2>Bagaimana ia berfungsi</h2>
+      <ol>
+        <li><strong>Imbas</strong> kod bar pada kotak ubat menggunakan kamera telefon.</li>
+        <li><strong>Cari</strong> padanan dalam katalog perniagaan anda.</li>
+        <li><strong>Terangkan</strong> kegunaan, dos dan amaran kepada pelanggan.</li>
+      </ol>
+    </div>
+  </section>
+{% endif %}
+{% endblock %}

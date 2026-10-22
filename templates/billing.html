@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Langganan &middot; CODE4CARE{% endblock %}
+{% block page_name %}billing{% endblock %}
+{% block content %}
+<section class="card">
+  <h1>Langganan &amp; Pelan</h1>
+  <p class="lead">
+    Perniagaan: <strong>{{ tenant.name if tenant else tenant_name }}</strong> &middot;
+    Pelan semasa: <span class="badge">{{ tenant.plan if tenant else 'trial' }}</span>
+  </p>
+  <p class="muted">
+    Pembayaran kad dan FPX akan diaktifkan di sini melalui pembekal pembayaran.
+    CODE4CARE hanya menyimpan ID pelanggan pembekal, bukan nombor kad.
+    Setiap webhook pembayaran disahkan sebelum pelan berubah.
+  </p>
+  <div class="actions">
+    <a class="button ghost" href="/usage">Lihat penggunaan</a>
+    <a class="button ghost" href="mailto:{{ support_email }}?subject=Pelan%20CODE4CARE">Hubungi kami tentang pelan</a>
+  </div>
+</section>
+{% endblock %}

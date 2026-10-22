@@ -758,13 +758,6 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         medicine = None
         value = barcode.strip()
 
-        if not value:
-            return ui.render(
-                request, "partials/scan_result.html", status_code=422,
-                error_code="invalid_barcode",
-                error_message="Masukkan kod bar atau nama ubat.",
-            )
-
         try:
             clean = validate_barcode(value)
         except InvalidBarcode as exc:

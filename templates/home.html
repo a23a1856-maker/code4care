@@ -59,14 +59,6 @@
     </section>
   {% endif %}
 
-  <section class="grid">
-    {% for item in nav if item.path not in ['/scan', '/search'] %}
-      <a class="tile" href="{{ item.path }}">
-        <span class="tile-label">{{ item.label }}</span>
-      </a>
-    {% endfor %}
-  </section>
-
   <section class="card">
     <div class="card-head">
       <h2>Imbasan terakhir</h2>

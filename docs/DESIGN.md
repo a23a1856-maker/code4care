@@ -47,10 +47,28 @@ there is no third-party request and the CSP stays strict.
   terms links, and the contact line required before launch.
 - Printable label pages keep their own `@media print` rules.
 
+## One page to scan or search
+
+"Cari Ubat" was a second page asking for the same thing as the scanner. They are now
+one screen, `/scan`, titled **Imbas & Cari**:
+
+- a gradient camera panel starts the scanner;
+- one text box takes **a barcode, an internal code (C4C-0001) or a name** — no second
+  form, no choice to make before typing;
+- a code resolves to the detail card; words resolve to a list of matches.
+
+`/search` still answers and shows the same page (old bookmarks keep working), and
+`/scan/lookup` stays a strict barcode endpoint so a bad scan is still an error rather
+than a text search. The nav has one entry instead of two.
+
+The first page (signed in) is deliberately two blocks: the scan/search card with the
+catalogue numbers, then "Imbasan terakhir". The eight feature tiles were removed —
+the nav already lists every page, and a dashboard that repeats it is noise.
+
 ## Screens touched
 
-Home (signed in and landing), sign-in, scan, search, medicine details, history,
-favourites, import, labels, team, usage, settings, billing, privacy, terms and the
-error pages all use the new tokens. The functional hooks (`data-error`,
-`data-scan`, `data-image`, `data-page`, form ids) are unchanged, so the acceptance
-tests and the browser checks still pass.
+Home (signed in and landing), sign-in, scan, medicine details, history, favourites,
+import, labels, team, usage, settings, billing, privacy, terms and the error pages all
+use the new tokens. The functional hooks (`data-error`, `data-scan`, `data-image`,
+`data-page`, form ids) are unchanged, so the acceptance tests and the browser checks
+still pass.

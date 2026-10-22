@@ -28,7 +28,7 @@ Useful addresses:
 |---|---|
 | Sign in | `/login` |
 | Barcode scanner | `/scan` |
-| Medicine lookup | `/search` |
+| Medicine lookup | `/scan` (one box for code, name or camera) |
 | Scan history | `/history` |
 | Import catalogue (Excel/CSV) | `/catalog/import` |
 | Medicine pictures (upload on the page, or a ZIP on the import page) | `/medicines/<id>`, `/catalog/import` |

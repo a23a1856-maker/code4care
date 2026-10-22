@@ -49,8 +49,7 @@ PERMISSION_LABELS = {
 PUBLIC = "public"
 
 NAV_ITEMS = (
-    ("/scan", "Imbas Ubat", PERM_SCAN),
-    ("/search", "Cari Ubat", PERM_LOOKUP),
+    ("/scan", "Imbas & Cari", PERM_SCAN),
     ("/history", "Sejarah Imbasan", PERM_SCAN),
     ("/favourites", "Kegemaran", PERM_SCAN),
     ("/catalog/import", "Import Katalog", PERM_SETTINGS),

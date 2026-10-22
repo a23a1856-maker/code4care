@@ -6,7 +6,7 @@ Added at the owner's request after version 1. `blueprint.json` is unchanged.
 
 - the medicine details page (`/medicines/<id>`): a photo card beside the details,
   with a neutral "Tiada gambar" placeholder when there is none
-- search results (`/search`): a small thumbnail
+- search results on **Imbas & Cari** (`/scan`, and `/search`): a small thumbnail
 - scan results (`/scan`): the photo beside the found medicine
 
 ## How to add a picture

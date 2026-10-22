@@ -54,6 +54,7 @@ ROUTE_RULES: dict[str, str] = {
     "/terms": PUBLIC,
     "/scan": PERM_SCAN,
     "/scan/lookup": PERM_SCAN,
+    "/scan/cari": PERM_SCAN,
     "/search": PERM_LOOKUP,
     "/lookup/barcode": PERM_LOOKUP,
     "/medicines/{medicine_id}": PERM_DETAILS,
@@ -706,6 +707,26 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def scan_page(request: Request):
         return ui.render(request, "scan.html")
 
+    def _name_search(request: Request, conn, user: dict, value: str):
+        """The scan page's one box also takes a name, brand or active ingredient."""
+        try:
+            query = normalize_query(value)
+        except InvalidBarcode as exc:
+            return ui.render(
+                request, "partials/lookup_result.html", status_code=422,
+                error_code="invalid_lookup", error_message=str(exc), results=[],
+            )
+        results = db.search_medicines(conn, user["tenant_id"], query)
+        settings = request.app.state.settings
+        with_images = {
+            medicine["id"] for medicine in results
+            if images.has_image(settings, user["tenant_id"], medicine["id"])
+        }
+        return ui.render(
+            request, "partials/lookup_result.html", results=results,
+            query=query, with_images=with_images,
+        )
+
     @app.get("/labels/test", response_class=HTMLResponse)
     def test_labels(request: Request, page: str = "1"):
         user = _user(request)
@@ -735,13 +756,22 @@ def create_app(settings: Settings | None = None) -> FastAPI:
         conn = _conn(request)
         user = _user(request)
         medicine = None
+        value = barcode.strip()
+
+        if not value:
+            return ui.render(
+                request, "partials/scan_result.html", status_code=422,
+                error_code="invalid_barcode",
+                error_message="Masukkan kod bar atau nama ubat.",
+            )
+
         try:
-            clean = validate_barcode(barcode)
+            clean = validate_barcode(value)
         except InvalidBarcode as exc:
             # A QR label or an internal catalogue code is acceptable only when it
             # really exists in this business's catalogue; anything else is refused.
             try:
-                candidate = catalog_import.normalise_product_code(barcode)
+                candidate = catalog_import.normalise_product_code(value)
             except ValueError:
                 candidate = ""
             medicine = (
@@ -776,9 +806,70 @@ def create_app(settings: Settings | None = None) -> FastAPI:
             ) if medicine else 0,
         )
 
+    @app.post(
+        "/scan/cari",
+        response_class=HTMLResponse,
+        dependencies=[Depends(security.verify_csrf)],
+    )
+    def scan_search(
+        request: Request,
+        q: str = Form(default=""),
+        request_id: str = Form(default=""),
+    ):
+        """The merged page's single box: a code opens the card, words find matches.
+
+        Kept apart from /scan/lookup so a scanned code is still validated strictly
+        (an invalid barcode is an error there, never a text search).
+        """
+        conn = _conn(request)
+        user = _user(request)
+        value = q.strip()
+        if not value:
+            return ui.render(
+                request, "partials/lookup_result.html", status_code=422,
+                error_code="invalid_lookup",
+                error_message="Masukkan kod bar atau nama ubat.", results=[],
+            )
+
+        code = ""
+        try:
+            code = validate_barcode(value)
+        except InvalidBarcode:
+            try:
+                candidate = catalog_import.normalise_product_code(value)
+            except ValueError:
+                candidate = ""
+            if candidate and db.find_medicine_by_barcode(
+                conn, user["tenant_id"], candidate
+            ):
+                code = candidate
+
+        if not code:
+            return _name_search(request, conn, user, value)
+
+        medicine = db.find_medicine_by_barcode(conn, user["tenant_id"], code)
+        scan_id = db.save_scan(
+            conn, user["tenant_id"], user["id"], code,
+            medicine["id"] if medicine else None, "camera", request_key(request_id),
+        )
+        db.audit(conn, user["tenant_id"], user["id"], "scan.created", code)
+        settings = request.app.state.settings
+        return ui.render(
+            request, "partials/scan_result.html",
+            scan_id=scan_id, barcode=code, medicine=medicine,
+            extra=_medicine_extra(medicine),
+            has_image=bool(medicine) and images.has_image(
+                settings, user["tenant_id"], medicine["id"]
+            ),
+            image_version=images.image_version(
+                settings, user["tenant_id"], medicine["id"]
+            ) if medicine else 0,
+        )
+
     @app.get("/search", response_class=HTMLResponse)
     def search_page(request: Request):
-        return ui.render(request, "search.html")
+        """Merged into the scan page: one box takes a code or a medicine name."""
+        return ui.render(request, "scan.html")
 
     @app.post(
         "/search", response_class=HTMLResponse, dependencies=[Depends(security.verify_csrf)]

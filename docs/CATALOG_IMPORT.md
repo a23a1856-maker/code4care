@@ -52,7 +52,7 @@ Unknown columns are ignored and listed in the result.
 ### Scanning vs searching internal codes
 
 A camera reads EAN/UPC digits only, so an internal code such as `C4C-0001`
-cannot be scanned. It can still be found with **Cari Ubat**.
+cannot be scanned. It can still be found with **Imbas & Cari**.
 
 ## Verified rows
 

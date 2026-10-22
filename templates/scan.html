@@ -1,15 +1,15 @@
 {% extends "base.html" %}
-{% block title %}Imbas Ubat &middot; CODE4CARE{% endblock %}
+{% block title %}Imbas &amp; Cari Ubat &middot; CODE4CARE{% endblock %}
 {% block page_name %}scan{% endblock %}
 {% block content %}
 <section class="card">
   <div class="hero-head">
-    <span class="pill">IMBAS</span>
-    <h1>Imbas Kod Ubat</h1>
+    <span class="pill">IMBAS &amp; CARI</span>
+    <h1>Imbas atau cari ubat</h1>
   </div>
   <p class="lead">
-    Letakkan kod bar pada kotak ubat di dalam ruang imbasan. Kamera hanya digunakan
-    selepas anda membenarkannya, dan imej tidak dihantar ke pelayan.
+    Imbas kod bar pada kotak ubat dengan kamera. Kalau tiada kotak atau kamera
+    tidak berfungsi, taip kod bar atau nama ubat &mdash; semuanya dalam satu kotak.
   </p>
 
   <button class="scan-panel" type="button" id="start-camera">
@@ -36,26 +36,27 @@
     </div>
     <div class="scanner-actions">
       <button class="button ghost" type="button" id="stop-camera" hidden>Hentikan kamera</button>
-      <a class="button ghost" href="/search">Cari secara manual</a>
+      <a class="button ghost" href="/labels/test">Label ujian</a>
     </div>
   </div>
 
-  <div class="divider"><span>kalau tak boleh imbas, taip kod ubat</span></div>
+  <div class="divider"><span>atau taip kod bar / nama ubat</span></div>
 
-  <form id="scan-form" class="stack" method="post" action="/scan/lookup"
-        hx-post="/scan/lookup" hx-target="#scan-result" hx-swap="innerHTML"
+  <form id="scan-form" class="stack" method="post" action="/scan/cari"
+        hx-post="/scan/cari" hx-target="#scan-result" hx-swap="innerHTML"
         hx-indicator="#scan-busy">
     <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
     <input type="hidden" name="request_id" id="request-id" value="">
-    <label for="barcode-input">Kod bar ubat</label>
+    <label for="barcode-input">Kod bar, kod katalog atau nama ubat</label>
     <div class="search-row">
-      <input id="barcode-input" name="barcode" inputmode="numeric" autocomplete="off"
-             autocapitalize="characters" maxlength="32" placeholder="cth: 9550010000015 atau C4C-0001"
+      <input id="barcode-input" name="q" autocomplete="off" autocapitalize="characters"
+             maxlength="64" placeholder="cth: 9550010000013, C4C-0001 atau Paracetamol"
              required autofocus>
-      <button class="button" type="submit">Semak</button>
+      <button class="button" type="submit">Cari</button>
     </div>
     <p class="hint">
-      Boleh juga guna pembaca kod bar USB: letakkan kursor dalam medan ini dan imbas.
+      Boleh taip sebahagian nama, jenama atau bahan aktif. Pembaca kod bar USB juga
+      berfungsi: letakkan kursor dalam medan ini dan imbas.
     </p>
     <p class="busy" id="scan-busy" aria-live="polite">Menyemak&hellip;</p>
   </form>
@@ -65,14 +66,14 @@
 
 <section class="card ghost-card">
   <div class="card-head">
-    <h2>Jika kod bar tidak dijumpai</h2>
-    <a class="link" href="/labels/test">Label ujian</a>
+    <h2>Kalau ubat tidak dijumpai</h2>
+    <a class="link" href="/labels/test">Cetak label ujian</a>
   </div>
   <ul class="bullets">
-    <li>Pastikan kod bar tidak kabur atau terlipat.</li>
-    <li>Taip 8, 12 atau 13 digit kod bar secara manual di atas.</li>
-    <li>Atau <a href="/search">cari mengikut nama ubat</a> dalam katalog perniagaan anda.</li>
-    <li>Tiada kotak ubat untuk diuji? Buka <a href="/labels/test">label ujian</a> dan imbas skrin itu.</li>
+    <li>Untuk kod bar: pastikan ia tidak kabur atau terlipat, dan imbas dalam cahaya terang.</li>
+    <li>Untuk nama: semak ejaan, atau cuba bahan aktif (cth. <span class="mono">Paracetamol</span>).</li>
+    <li>Tiada kotak ubat untuk diuji? Buka <a href="/labels/test">label ujian</a> dan imbas kod pada skrin.</li>
+    <li>Ubat yang belum ada dalam katalog boleh ditambah melalui <a href="/catalog/import">Import Katalog</a>.</li>
   </ul>
 </section>
 {% endblock %}

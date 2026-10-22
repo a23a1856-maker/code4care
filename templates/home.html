@@ -7,7 +7,7 @@
     <section class="card">
       <div class="hero-head">
         <span class="pill">CARI UBAT</span>
-        <h1>Imbas atau taip kod ubat</h1>
+        <h1>Imbas atau cari ubat</h1>
       </div>
 
       <a class="scan-panel" href="/scan">
@@ -24,20 +24,20 @@
         </span>
       </a>
 
-      <div class="divider"><span>kalau tak boleh imbas, taip kod ubat</span></div>
+      <div class="divider"><span>kalau tak boleh imbas, taip kod atau nama ubat</span></div>
 
-      <form class="search-row" method="post" action="/lookup/barcode"
-            hx-post="/lookup/barcode" hx-target="#home-results" hx-swap="innerHTML">
+      <form class="search-row" method="post" action="/scan/cari"
+            hx-post="/scan/cari" hx-target="#home-results" hx-swap="innerHTML">
         <input type="hidden" name="csrf_token" value="{{ csrf_token }}">
         <input type="hidden" name="request_id" value="">
-        <input id="home-code" name="barcode" inputmode="numeric" autocomplete="off"
-               maxlength="32" placeholder="cth: 9550010000015 atau C4C-0001"
-               aria-label="Kod ubat" required>
+        <input id="home-code" name="q" autocomplete="off"
+               maxlength="64" placeholder="cth: 9550010000015, C4C-0001 atau Paracetamol"
+               aria-label="Kod bar atau nama ubat" required>
         <button class="button" type="submit">Cari</button>
       </form>
       <p class="hint">
-        Kod ada dicetak di bawah barcode pada label (cth. <span class="mono">C4C-0001</span>)
-        atau boleh dilihat dalam butiran ubat.
+        Kod ada dicetak di bawah barcode pada label (cth. <span class="mono">C4C-0001</span>).
+        Nama, jenama dan bahan aktif juga boleh ditaip.
       </p>
       <div id="home-results" aria-live="polite"></div>
 

@@ -755,6 +755,12 @@ label.check input[type="checkbox"] {
   text-align: center;
 }
 .footer p { margin: 0 0 0.4rem; }
+.footer .footer-date {
+  margin: 0.15rem 0 0.55rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--rose-dark);
+}
 .footer a { color: var(--rose-dark); }
 
 .prose h2 { margin-top: 1.1rem; font-size: 1rem; }

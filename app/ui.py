@@ -1,6 +1,7 @@
 """Page rendering: one Jinja environment, one context shared by every page."""
 from __future__ import annotations
 
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from fastapi import Request
@@ -12,13 +13,39 @@ from app import permissions
 ROOT = Path(__file__).resolve().parent.parent
 templates = Jinja2Templates(directory=str(ROOT / "templates"))
 
+# Malaysia keeps one offset all year (no daylight saving), so a fixed zone needs
+# no tz database on the server.
+MALAYSIA_TZ = timezone(timedelta(hours=8), "MYT")
+HARI = ("Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu", "Ahad")
+BULAN = (
+    "Januari", "Februari", "Mac", "April", "Mei", "Jun",
+    "Julai", "Ogos", "September", "Oktober", "November", "Disember",
+)
+
+
+def malaysia_today(now: datetime | None = None) -> datetime:
+    """The moment in Malaysia, whatever zone the server runs in."""
+    moment = now or datetime.now(timezone.utc)
+    if moment.tzinfo is None:
+        moment = moment.replace(tzinfo=timezone.utc)
+    return moment.astimezone(MALAYSIA_TZ)
+
+
+def today_label(now: datetime | None = None) -> str:
+    """e.g. 'Jumaat, 23 Oktober 2026'."""
+    moment = malaysia_today(now)
+    return f"{HARI[moment.weekday()]}, {moment.day} {BULAN[moment.month - 1]} {moment.year}"
+
 
 def _context(request: Request) -> dict:
     settings = request.app.state.settings
     user = getattr(request.state, "user", None)
     role = (user or {}).get("role")
+    today = malaysia_today()
     return {
         "request": request,
+        "today_label": today_label(today),
+        "today_iso": today.date().isoformat(),
         "user": user,
         "role": role,
         "role_label": role or "",

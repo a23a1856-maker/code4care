@@ -8,6 +8,12 @@ services:
       DATABASE_PATH: /srv/code4care/data/code4care.db
       ENVIRONMENT: production
       BASE_URL: ${BASE_URL:-https://code4care.example}
+      # DEMO BOX ONLY. 1 = the one-click sign-in panel is shown and every page signs
+      # the demo pharmacy owner in, so nobody ever stops at the sign-in page. Set
+      # both to 0 (or drop them) before a real pharmacy's data lives on this server:
+      # anyone who can open the site would be signed in as the owner.
+      DEMO_SIGN_IN: ${DEMO_SIGN_IN:-1}
+      DEMO_AUTO_SIGN_IN: ${DEMO_AUTO_SIGN_IN:-1}
     volumes:
       - ./data:/srv/code4care/data
       - ./backups:/srv/code4care/backups

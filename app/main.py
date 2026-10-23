@@ -168,6 +168,7 @@ class RequestPipeline(BaseHTTPMiddleware):
         request.state.tenant_name = ""
         request.state.csrf = ""
         request.state.conn = None
+        request.state.new_session = None
         tenant_scope = 0
 
         if settings.is_production:
@@ -196,6 +197,14 @@ class RequestPipeline(BaseHTTPMiddleware):
         try:
             token = request.cookies.get(SESSION_COOKIE)
             resolved = auth.resolve_session(conn, token, settings) if token else None
+            if (
+                resolved is None
+                and settings.demo_auto_sign_in
+                and _signs_in_without_the_page(request)
+            ):
+                token = _demo_sign_in(request, conn)
+                request.state.new_session = token
+                resolved = auth.resolve_session(conn, token, settings) if token else None
             if resolved:
                 request.state.session = resolved["session"]
                 request.state.user = resolved["user"]
@@ -264,6 +273,8 @@ class RequestPipeline(BaseHTTPMiddleware):
         return PlainTextResponse(SIGNED_OUT_MESSAGE, status_code=401)
 
     def _finish(self, request, response, started: float, tenant_scope, new_csrf):
+        if getattr(request.state, "new_session", None):
+            _set_session(response, request.state.new_session, self.settings)
         if new_csrf:
             response.set_cookie(
                 CSRF_COOKIE,
@@ -376,6 +387,29 @@ def _sign_in(request: Request, user: dict) -> tuple[str, dict]:
     return token, {"csrf": csrf}
 
 
+# ------------------------------------------------------------------- demo sign-in
+
+# Pages that are about signing in (or are not pages at all) never sign anyone in:
+# the demo box still needs a way to show the panel, switch account and log out.
+DEMO_AUTO_SKIP = ("/login", "/logout", "/dev/login", "/health")
+DEMO_AUTO_SKIP_PREFIXES = ("/auth/", "/static/")
+
+
+def _signs_in_without_the_page(request: Request) -> bool:
+    """DEMO_AUTO_SIGN_IN: is this a page the demo owner should simply land on?"""
+    path = request.url.path
+    return path not in DEMO_AUTO_SKIP and not path.startswith(DEMO_AUTO_SKIP_PREFIXES)
+
+
+def _demo_sign_in(request: Request, conn) -> str | None:
+    """Open a session for the demo pharmacy's owner. None when there is no account."""
+    account = db.demo_account(conn)
+    if account is None:
+        return None
+    token, _payload = _sign_in(request, account)
+    return token
+
+
 # ------------------------------------------------------------------------- factory
 
 
@@ -435,7 +469,12 @@ def create_app(settings: Settings | None = None) -> FastAPI:
     def login_page(request: Request):
         settings = request.app.state.settings
         accounts = db.list_dev_accounts(_conn(request)) if settings.dev_sign_in else []
-        return ui.render(request, "login.html", dev_accounts=accounts)
+        return ui.render(
+            request,
+            "login.html",
+            dev_accounts=accounts,
+            demo_needs_seed=bool(settings.dev_sign_in and not accounts),
+        )
 
     @app.post("/login", response_class=HTMLResponse, dependencies=[Depends(security.verify_csrf)])
     def login_submit(request: Request, email: str = Form(default="")):

@@ -27,6 +27,10 @@ def settings(tmp_path, monkeypatch):
     monkeypatch.setenv("GOOGLE_CLIENT_SECRET", "test-google-secret")
     monkeypatch.setenv("PAYMENT_API_KEY", "")
     monkeypatch.setenv("PAYMENT_WEBHOOK_SECRET", "")
+    # The demo switches belong to the machine, not the suite: pin them off so a
+    # developer's .env cannot change what the tests see.
+    monkeypatch.setenv("DEMO_SIGN_IN", "")
+    monkeypatch.setenv("DEMO_AUTO_SIGN_IN", "")
     from app.config import Settings
 
     return Settings.from_env()

@@ -14,8 +14,9 @@ uvicorn app.main:app --reload
 Open http://localhost:8000 and sign in with `pemilik@farmasi-demo.my`. In
 development the sign-in page shows a **one-click sign-in** panel for every account
 in the local database (`/dev/login`), so there is no e-mail and no second factor to
-chase. That panel and route exist only when `ENVIRONMENT=development`; tests assert
-they are absent in `testing` and `production`.
+chase. That panel and route appear when `ENVIRONMENT=development` or
+`DEMO_SIGN_IN=1`; tests assert they are absent in `testing` and in a plain
+`production` (both demo flags unset).
 
 If you use the normal form instead: in development the e-mail is printed to the
 console and the "check your e-mail" page also shows the magic link, so the flow is
@@ -54,6 +55,8 @@ The suite covers the skeleton (M0), authentication (M1), authorization and tenan
 | `APP_SECRET` | Signs CSRF and OAuth state values; required |
 | `DATABASE_PATH` | SQLite file, default `data/code4care.db` |
 | `ENVIRONMENT` | `development`, `testing` or `production` |
+| `DEMO_SIGN_IN` | `1` shows the one-click sign-in panel in any environment; off when unset |
+| `DEMO_AUTO_SIGN_IN` | `1` signs the demo owner in on every page, so the sign-in page is skipped; off when unset |
 | `BASE_URL` | Public URL, used in magic links and the Google redirect |
 | `EMAIL_API_KEY` | Email provider key; empty means print to the console |
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google sign-in |
@@ -92,6 +95,26 @@ The compose file runs the app behind the published port; terminate TLS in front
 of it (Caddy or nginx with Let's Encrypt) and forward `X-Forwarded-Proto`.
 The app redirects any non-HTTPS request and sends HSTS, so TLS must be terminated
 before the request reaches the app.
+
+### Demo box: no sign-in step
+
+A deployed demo should behave like the local one, so the compose file sets both
+demo flags:
+
+- `DEMO_SIGN_IN=1` shows the one-click panel for every account in the database,
+  even under `ENVIRONMENT=production`. `/login` stays reachable, so you can switch
+  account or log out.
+- `DEMO_AUTO_SIGN_IN=1` opens a session for the demo pharmacy's owner on every page
+  except `/login`, `/logout`, `/auth/*` and `/static/*`. The app never stops at the
+  sign-in page. With no account in the database yet, run
+  `docker compose exec app python -m scripts.seed_demo` once.
+
+Anyone who can open the URL is signed in as the owner, so use this only with a demo
+database. Before real pharmacy data lives on the server, set `DEMO_SIGN_IN=0` and
+`DEMO_AUTO_SIGN_IN=0` in `.env`, run `docker compose up -d --build`, and the normal
+sign-in page and its permission checks come back. The permission matrix still
+applies to whoever signs in; the flags only decide how someone signs in, not what
+they may do.
 
 ## What is built
 

@@ -37,6 +37,11 @@ def _int(name: str, default: int) -> int:
         return default
 
 
+def _flag(name: str) -> bool:
+    """A checkbox in the environment: off unless it says one of these words."""
+    return os.environ.get(name, "").strip().lower() in {"1", "true", "yes", "on", "ya"}
+
+
 @dataclass(frozen=True)
 class Settings:
     app_secret: str
@@ -56,6 +61,10 @@ class Settings:
     payment_webhook_secret: str = ""
     support_email: str = "sokongan@code4care.my"
     support_whatsapp: str = "+60123456789"
+    # Demo boxes: the one-click sign-in panel, and signing in without the page.
+    # Both are off unless the machine sets them; production stays closed by default.
+    demo_sign_in: bool = False
+    demo_auto_sign_in: bool = False
     session_ttl_seconds: int = 8 * 60 * 60
     login_code_ttl_seconds: int = 15 * 60
     two_factor_ttl_seconds: int = 5 * 60
@@ -93,6 +102,8 @@ class Settings:
             payment_webhook_secret=os.environ.get("PAYMENT_WEBHOOK_SECRET", ""),
             support_email=os.environ.get("SUPPORT_EMAIL", "sokongan@code4care.my"),
             support_whatsapp=os.environ.get("SUPPORT_WHATSAPP", "+60123456789"),
+            demo_sign_in=_flag("DEMO_SIGN_IN"),
+            demo_auto_sign_in=_flag("DEMO_AUTO_SIGN_IN"),
             session_ttl_seconds=_int("SESSION_TTL_SECONDS", 8 * 60 * 60),
         )
 
@@ -106,8 +117,8 @@ class Settings:
 
     @property
     def dev_sign_in(self) -> bool:
-        """One-click sign-in for local development only; never in production."""
-        return self.environment == "development"
+        """One-click sign-in: local development, or a demo box with DEMO_SIGN_IN=1."""
+        return self.environment == "development" or self.demo_sign_in
 
     @property
     def database(self) -> Path:

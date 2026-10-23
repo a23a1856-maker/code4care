@@ -12,10 +12,10 @@
 
   {% if dev_accounts %}
     <div class="dev-panel" data-dev-sign-in="true">
-      <h2>Masuk pantas (pembangunan)</h2>
+      <h2>Masuk pantas (demo)</h2>
       <p class="hint">
-        Satu klik, tanpa e-mel dan tanpa pengesahan dua langkah. Pilihan ini hanya
-        muncul apabila <code>ENVIRONMENT=development</code>.
+        Satu klik, tanpa e-mel dan tanpa pengesahan dua langkah. Pilihan ini muncul
+        apabila <code>ENVIRONMENT=development</code> atau <code>DEMO_SIGN_IN=1</code>.
       </p>
       {% for account in dev_accounts %}
         <form method="post" action="/dev/login">
@@ -27,6 +27,16 @@
           </button>
         </form>
       {% endfor %}
+    </div>
+    <div class="divider"><span>atau guna e-mel</span></div>
+  {% elif demo_needs_seed %}
+    <div class="dev-panel" data-dev-sign-in="true">
+      <h2>Masuk pantas (demo)</h2>
+      <p class="hint">
+        Belum ada akaun dalam pangkalan data ini. Jalankan
+        <code>python -m scripts.seed_demo</code> di pelayan, kemudian muat semula
+        halaman ini.
+      </p>
     </div>
     <div class="divider"><span>atau guna e-mel</span></div>
   {% endif %}

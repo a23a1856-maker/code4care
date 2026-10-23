@@ -340,6 +340,21 @@ def list_dev_accounts(conn: sqlite3.Connection, limit: int = 10) -> list[dict]:
     return [dict(row) for row in rows]
 
 
+def demo_account(conn: sqlite3.Connection) -> dict | None:
+    """The account a demo box signs in as: the first pharmacy owner, else anyone.
+
+    Only used when DEMO_AUTO_SIGN_IN=1, so a demo never stops at the sign-in page.
+    """
+    row = conn.execute(
+        "SELECT * FROM users WHERE is_owner = 1 AND email_verified = 1 ORDER BY id LIMIT 1"
+    ).fetchone()
+    if row is None:
+        row = conn.execute(
+            "SELECT * FROM users WHERE email_verified = 1 ORDER BY id LIMIT 1"
+        ).fetchone()
+    return dict(row) if row else None
+
+
 def list_users(conn: sqlite3.Connection, tenant_id: int) -> list[dict]:
     rows = scoped(conn, "SELECT * FROM users WHERE tenant_id = ? ORDER BY id", tenant_id)
     return [dict(row) for row in rows]
